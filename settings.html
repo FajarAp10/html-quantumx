@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings – QuantumX</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #0a0a0d;
+        color: white;
+    }
+
+    /* HEADER */
+    .top-bar {
+        width: 100%;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .top-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #d7e8ff;
+    }
+
+    .admin-btn {
+        background: linear-gradient(135deg,#003d6b,#0078c2);
+        border: none;
+        padding: 8px 18px;
+        margin-right:50px;
+        font-size: 14px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        transition: 0.25s;
+        font-weight: 500;
+        box-shadow: 0 0 12px rgba(0,120,200,0.3);
+    }
+    .admin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 14px rgba(0,160,255,0.5);
+    }
+
+    .settings-container {
+    padding: 25px;
+    max-width: 700px; /* lebar maksimal card */
+    margin: 0 auto; /* center */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* jarak antar card */
+}
+
+
+    .settings-card {
+        background: rgba(255,255,255,0.03);
+        padding: 25px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.07);
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .settings-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #cdd8ff;
+    }
+
+    .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    .change-ai-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg,#003d6b,#0078c2);
+        border: none;
+        color: white;
+        border-radius: 14px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 500;
+        box-shadow: 0 0 12px rgba(0,120,200,0.35);
+    }
+    .change-ai-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 18px rgba(0,160,255,0.5);
+    }
+
+    /* POPUP */
+    .popup-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .popup-box {
+        width: 90%;
+        max-width: 350px;
+        background: #12141c;
+        padding: 25px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 0 25px rgba(0,0,0,0.55);
+        animation: popupZoom 0.25s ease;
+    }
+
+    @keyframes popupZoom {
+        from {opacity: 0; transform: scale(0.75);}
+        to {opacity: 1; transform: scale(1);}
+    }
+
+    .popup-title {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .ai-option {
+        padding: 14px;
+        border-radius: 14px;
+        margin: 10px 0;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 15px;
+    }
+
+    .ai-option:hover {
+        background: rgba(255,255,255,0.07);
+    }
+
+    .ai-selected {
+        border: 1px solid #0098ff;
+        background: rgba(0,150,255,0.12);
+    }
+
+    .popup-ok {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background: linear-gradient(135deg,#003d6b,#0078c2);
+        border: none;
+        color: white;
+        border-radius: 14px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+    .popup-ok:hover {
+        box-shadow: 0 0 18px rgba(0,160,255,0.4);
+    }
+
+    /* SMALL POPUP */
+    .small-popup {
+        position: fixed;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(30,30,40,0.95);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 200;
+    }
+    .small-popup.show {
+        opacity: 1;
+        bottom: 45px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="top-bar">
+    <div class="top-title">⚙ Settings</div>
+    <button class="admin-btn" onclick="goAdmin()">Admin</button>
+</div>
+
+<!-- CONTENT -->
+<div class="settings-container">
+    <!-- Card 1: Pengaturan AI -->
+    <div class="settings-card">
+        <div class="settings-title">Pengaturan AI</div>
+        <div class="setting-row">
+            <span>Model AI Saat Ini:</span>
+            <strong id="currentModel">Dark</strong>
+        </div>
+        <button class="change-ai-btn" onclick="openPopup()">Ganti Model AI</button>
+    </div>
+
+    <!-- Card 2: Pengenalan AI -->
+    <div class="settings-card">
+        <div class="settings-title">Pengenalan AI</div>
+        <div class="ai-description">
+            <p><strong>Dark Mode:</strong> AI ini menggunakan mode ilegal dengan bahasa yang keras dan toxic. Cocok untuk pengguna kalangan kriminalisme atau hacking.</p>
+            <p><strong>Normal Mode:</strong> AI ini menggunakan mode standar, lebih ramah dan aman untuk semua percakapan.</p>
+        </div>
+    </div>
+
+    <!-- Card 3: Contoh Card Baru -->
+    <div class="settings-card">
+        <div class="settings-title">Tips Menggunakan AI</div>
+        <div class="ai-description">
+            <p>Gunakan Dark Mode untuk kejahatan .</p>
+            <p>Gunakan Normal Mode untuk percakapan aman, ramah, dan cocok untuk semua usia.</p>
+            <p>Periksa model AI sebelum memulai percakapan agar hasil sesuai keinginan.</p>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- POPUP -->
+<div class="popup-bg" id="popupAI">
+    <div class="popup-box">
+        <div class="popup-title">Pilih Model AI</div>
+
+        <div class="ai-option" id="optDark" onclick="selectAI('dark')">
+            Dark (Default)
+        </div>
+
+        <div class="ai-option" id="optNormal" onclick="selectAI('normal')">
+            Normal
+        </div>
+
+        <button class="popup-ok" onclick="confirmAI()">Oke</button>
+    </div>
+</div>
+
+<div class="small-popup" id="notifPopup">
+    Model AI berhasil diubah!
+</div>
+
+
+
+<script>
+let selectedModel = "dark"; 
+let aiMode = localStorage.getItem("aiMode") || "dark";
+
+function goAdmin() {
+    window.location.href = "admin.html";
+}
+
+function openPopup() {
+    document.getElementById("popupAI").style.display = "flex";
+}
+
+function selectAI(mode) {
+    selectedModel = mode;
+
+    document.getElementById("optDark").classList.remove("ai-selected");
+    document.getElementById("optNormal").classList.remove("ai-selected");
+
+    if (mode === "dark") document.getElementById("optDark").classList.add("ai-selected");
+    if (mode === "normal") document.getElementById("optNormal").classList.add("ai-selected");
+}
+
+function confirmAI() {
+    document.getElementById("currentModel").innerText = 
+        selectedModel === "dark" ? "Dark" : "Normal";
+
+    document.getElementById("popupAI").style.display = "none";
+
+    localStorage.setItem("aiMode", selectedModel.toLowerCase());
+    localStorage.setItem("aiShouldReset", "yes");
+
+    showNotif();
+}
+
+function showNotif() {
+    const notif = document.getElementById("notifPopup");
+    notif.classList.add("show");
+
+    setTimeout(() => {
+        notif.classList.remove("show");
+    }, 1800);
+}
+
+window.onload = () => {
+    const saved = localStorage.getItem("aiMode") || "dark";
+
+    selectedModel = saved;
+    document.getElementById("currentModel").innerText =
+        saved === "dark" ? "Dark" : "Normal";
+
+    if (saved === "dark") selectAI("dark");
+    else selectAI("normal");
+};
+</script>
+
+</body>
+</html>

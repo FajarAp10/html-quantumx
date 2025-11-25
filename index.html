@@ -179,12 +179,6 @@ h2 span {
   <div id="userNameDisplayDesktop" style="font-size:14px; color:#ccc; margin-bottom:12px; pointer-events:none;">
     User-XXXX
   </div>
-
-  <!-- Tombol Mode DI SINI, bawah username -->
-  <div style="margin-bottom:12px;">
-    <button id="modeToggleDesktop" class="mode-btn">Dark Mode</button>
-  </div>
-
   <div class="new-chat">+ Obrolan Baru</div>
   <div class="chat-list"></div>
 </div>
@@ -193,13 +187,12 @@ h2 span {
 <!-- Chat Wrapper -->
 <div class="chat-wrapper">
   <div class="mobile-topbar">
-    <button id="mobileMenuBtn" class="mobile-menu-btn">⋮</button>
-    <span class="mobile-title" style="flex:1;">QuantumX</span>
-    <div style="display:flex; align-items:center; gap:6px;">
-      <button id="modeToggleMobile" class="mode-btn">Mode: Dark</button>
-      <button id="loginBtnMobile" class="login-btn">⚙️</button>
-    </div>
+  <button id="mobileMenuBtn" class="mobile-menu-btn">⋮</button>
+  <span class="mobile-title" style="flex:1;">QuantumX</span>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <button id="loginBtnMobile" class="login-btn">⚙️</button>
   </div>
+</div>
 
   <div id="chat">
     <div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>
@@ -493,33 +486,40 @@ const overlaySidebar=document.querySelector(".sidebar.overlay");
 const backdrop=document.querySelector(".sidebar-backdrop");
 mobileMenuBtn.addEventListener("click",()=>{overlaySidebar.classList.add("show");backdrop.style.display="block";});
 backdrop.addEventListener("click",()=>{overlaySidebar.classList.remove("show");backdrop.style.display="none";});
+
+
 document.querySelectorAll(".new-chat").forEach(btn => {
   btn.addEventListener("click", async () => {
 
-    // reset server memory
+    // 🔥 RESET SERVER MEMORY DENGAN MODE YANG BENAR
     try {
       await fetch(`${backendUrl}/api/ai`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ sender: senderId, message: "", reset: true })
-});
-
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender: senderId,
+          message: "",
+          reset: true,
+          mode: localStorage.getItem("aiMode") || "dark"
+        })
+      });
     } catch {}
 
-    // 🟢 FIX TERPENTING → reset id chat
+    // 🟢 RESET LOCAL CHAT
     currentChatId = null;
 
-    // tampilkan halaman kosong
+    // 🟢 TAMPILKAN HOME
     chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
   });
 });
 
+
 document.getElementById("loginBtnDesktop").onclick = () => {
-  window.location.href = "admin.html";
+  window.location.href = "settings.html";
 };
 
 document.getElementById("loginBtnMobile").onclick = () => {
-  window.location.href = "admin.html";
+  window.location.href = "settings.html";
 };
 
 async function generateImage() {
@@ -573,65 +573,38 @@ sendBtn.addEventListener("click",sendMsg);
 input.addEventListener("keydown",(e)=>{if(e.key==="Enter") sendMsg();});
 fetchLimit();
 
-// ===== MODE =====
-let aiMode = localStorage.getItem("aiMode") || "dark"; // default dark
+// ===== CEK APAKAH MODE BARU PERLU RESET =====
+async function checkModeReset() {
+    const shouldReset = localStorage.getItem("aiShouldReset");
+    if (shouldReset === "yes") {
+        try {
+            await fetch(`${backendUrl}/api/ai`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sender: senderId,
+                    message: "",
+                    reset: true,
+                    mode: localStorage.getItem("aiMode") || "dark"
+                })
+            });
+        } catch(e){
+            console.log("❌ Gagal reset AI mode:", e);
+        }
 
-function updateAIModeUI(){
-  // Update semua chat bubble (bot & user)
-  document.querySelectorAll(".msg.bot, .msg.user").forEach(msg => {
-    msg.classList.remove("dark","normal");
-    msg.classList.add(aiMode);
-  });
+        currentChatId = null;
+        chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
+        renderChatList();
 
-  // Update warna tombol sesuai mode
-  const desktopBtn = document.getElementById("modeToggleDesktop");
-  const mobileBtn = document.getElementById("modeToggleMobile");
-
-  if(aiMode === "dark"){
-    desktopBtn.classList.remove("normal");
-    desktopBtn.classList.add("dark");
-    desktopBtn.style.background = "#8b0000"; // merah gelap
-    mobileBtn.classList.remove("normal");
-    mobileBtn.classList.add("dark");
-    mobileBtn.style.background = "#8b0000";
-  } else {
-    desktopBtn.classList.remove("dark");
-    desktopBtn.classList.add("normal");
-    desktopBtn.style.background = "#2e7d32"; // hijau
-    mobileBtn.classList.remove("dark");
-    mobileBtn.classList.add("normal");
-    mobileBtn.style.background = "#2e7d32";
-  }
+        localStorage.removeItem("aiShouldReset");
+    }
 }
 
-// Fungsi untuk toggle mode (Desktop & Mobile)
-async function toggleMode() {
-  aiMode = aiMode === "dark" ? "normal" : "dark";
-  localStorage.setItem("aiMode", aiMode);
+// cek saat halaman dimuat
+window.addEventListener("DOMContentLoaded", checkModeReset);
 
-  document.getElementById("modeToggleDesktop").textContent = `Mode: ${aiMode.charAt(0).toUpperCase()+aiMode.slice(1)}`;
-  document.getElementById("modeToggleMobile").textContent = `Mode: ${aiMode.charAt(0).toUpperCase()+aiMode.slice(1)}`;
-
-  updateAIModeUI();
-
-  // 🔥 reset chat memory di backend supaya prompt sesuai mode
-  if(senderId) {
-    await fetch(`${backendUrl}/api/ai`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: senderId, message: "", reset: true, mode: aiMode })
-    });
-  }
-}
-
-// Pasang event listener
-document.getElementById("modeToggleDesktop").onclick = toggleMode;
-document.getElementById("modeToggleMobile").onclick = toggleMode;
-
-// Terapkan mode saat load awal
-document.getElementById("modeToggleDesktop").textContent = `Mode: ${aiMode.charAt(0).toUpperCase()+aiMode.slice(1)}`;
-document.getElementById("modeToggleMobile").textContent = `Mode: ${aiMode.charAt(0).toUpperCase()+aiMode.slice(1)}`;
-updateAIModeUI();
+// cek saat user balik ke tab
+window.addEventListener("focus", checkModeReset);
 
 
 </script>
