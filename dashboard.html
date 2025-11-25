@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuantumX Dashboard</title>
+<style>
+/* RESET */
+*{ margin:0; padding:0; box-sizing:border-box; font-family:"Inter", sans-serif; }
+body{ background:#050505; color:#fff; padding:25px; min-height:100vh; animation:fadeIn 0.5s ease; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);}}
+
+/* HEADER */
+.header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
+.header h1{ font-size:30px; font-weight:800; letter-spacing:1px; background:linear-gradient(90deg,#5bbcff,#8fd8ff); -webkit-background-clip:text; color:transparent; text-shadow:0 0 15px rgba(91,188,255,0.4); }
+
+/* LOGOUT BUTTON */
+.logout{ background:#ff3b3b; padding:10px 18px; border:none; border-radius:10px; cursor:pointer; color:white; font-weight:600; transition:0.25s; box-shadow:0 0 12px rgba(255,60,60,0.3); }
+.logout:hover{ background:#ff4d4d; transform:scale(1.05); box-shadow:0 0 20px rgba(255,60,60,0.5); }
+
+/* CARD */
+.card{ background:rgba(20,20,25,0.6); padding:25px; border-radius:18px; border:1px solid rgba(60,120,255,0.15); backdrop-filter:blur(10px); box-shadow:0 0 25px rgba(0,0,0,0.45); margin-bottom:28px; transition:0.3s; }
+.card:hover{ border-color:#3b82f6; box-shadow:0 0 25px rgba(59,130,246,0.3); }
+.card h2{ margin-bottom:18px; font-size:20px; font-weight:700; }
+
+/* INPUT */
+input{ width:100%; padding:14px; margin-bottom:12px; border-radius:12px; background:#0d0f12; border:1px solid #222; color:white; font-size:15px; transition:0.2s; }
+input:focus{ border-color:#3b82f6; outline:none; background:#11131a; box-shadow:0 0 12px rgba(59,130,246,0.25); }
+
+/* BUTTON */
+.btn{ width:100%; padding:14px; background:linear-gradient(90deg,#3b82f6,#60a5fa); border:none; color:white; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; transition:0.25s; }
+.btn:hover{ transform:scale(1.03); box-shadow:0 0 18px rgba(59,130,246,0.45); }
+
+/* TABLE */
+table{ width:100%; border-collapse:collapse; margin-top:10px; }
+th{ background:#12141a; padding:14px; text-align:left; border-bottom:1px solid #2a2a2a; color:#8ab8ff; font-weight:700; font-size:15px; letter-spacing:0.5px; }
+td{ padding:14px; border-bottom:1px solid #1b1b1b; color:#e8e8e8; }
+tr{ transition:0.2s; }
+tr:hover td{ background:#0f1118; color:#a7caff; }
+
+/* POPUP */
+.popup-backdrop {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.popup-box {
+  background:#111;
+  padding:22px;
+  width:90%;
+  max-width:340px;
+  border-radius:14px;
+  border:1px solid #333;
+  box-shadow:0 0 20px rgba(0,0,0,0.4);
+  text-align:center;
+  animation: popupFade .25s ease;
+}
+.popup-box h3{ font-size:18px; margin-bottom:10px; font-weight:600; }
+.popup-box p{ font-size:14px; margin-bottom:18px; color:#ccc; }
+.popup-btns{ display:flex; justify-content:space-between; gap:12px; }
+.popup-btn{ flex:1; padding:10px; border-radius:10px; cursor:pointer; font-weight:600; border:none; font-size:14px; }
+.popup-cancel{ background:#333; color:white; }
+.popup-delete{ background:#e53935; color:white; }
+.popup-ok{ background:#3b82f6; color:white; }
+@keyframes popupFade{ from{ transform:scale(0.8); opacity:0; } to{ transform:scale(1); opacity:1; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>QuantumX Admin Dashboard</h1>
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="card">
+  <h2>Tambah Limit User</h2>
+  <input id="userId" placeholder="User ID (contoh: user-xxxx)">
+  <input id="newLimit" placeholder="Limit baru (angka)">
+  <button class="btn" onclick="updateLimit()">Simpan</button>
+</div>
+
+<div class="card">
+  <h2>Daftar User & Limit</h2>
+  <button class="btn" style="margin-bottom:10px; background:#e53935;" onclick="deleteAllUsers()">Hapus Semua User</button>
+  <table id="userTable">
+    <tr>
+      <th>User ID</th>
+      <th>Limit</th>
+      <th>Aksi</th>
+    </tr>
+  </table>
+</div>
+
+<!-- POPUP -->
+<div id="popup" class="popup-backdrop">
+  <div class="popup-box">
+    <h3 id="popupTitle">Judul</h3>
+    <p id="popupText">Isi pesan</p>
+    <div class="popup-btns" id="popupBtns">
+      <!-- Tombol akan disesuaikan JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("admin")!=="true"){ window.location.href="admin.html"; }
+const SERVER = "https://quantumx.zeabur.app";
+
+let deleteTargetUser = null;
+let deleteAllFlag = false;
+
+// Load user list
+async function loadUsers(){
+  const res = await fetch(`${SERVER}/api/users`);
+  const data = await res.json();
+  const table = document.getElementById("userTable");
+  table.innerHTML = `<tr><th>User ID</th><th>Limit</th><th>Aksi</th></tr>`;
+  for(const id in data){
+    table.innerHTML += `<tr>
+      <td>${id}</td>
+      <td>${data[id]}</td>
+      <td><button onclick="deleteUser('${id}')" style="background:#ff4d4d;border:none;padding:6px 12px;border-radius:6px;color:white;cursor:pointer;">Hapus</button></td>
+    </tr>`;
+  }
+}
+
+// Show popup
+function showPopup(title,text,buttons){
+  const popup=document.getElementById("popup");
+  document.getElementById("popupTitle").textContent=title;
+  document.getElementById("popupText").textContent=text;
+  const btnContainer=document.getElementById("popupBtns");
+  btnContainer.innerHTML="";
+  buttons.forEach(b=>{
+    const btn=document.createElement("button");
+    btn.textContent=b.text;
+    btn.className="popup-btn "+b.className;
+    btn.onclick=b.onClick;
+    btnContainer.appendChild(btn);
+  });
+  popup.style.display="flex";
+}
+
+// Close popup
+function closePopup(){
+  deleteTargetUser=null;
+  deleteAllFlag=false;
+  document.getElementById("popup").style.display="none";
+}
+
+// Tambah / update limit
+function updateLimit(){
+  const id=document.getElementById("userId").value.trim();
+  const limit=document.getElementById("newLimit").value.trim();
+  if(!id || !limit){
+    showPopup("Peringatan","Isi User dan Limit dulu!",[
+      {text:"OK",className:"popup-ok",onClick:()=>closePopup()}
+    ]);
+    return;
+  }
+  fetch(`${SERVER}/api/setlimit`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({id,limit})
+  }).then(()=>{
+    showPopup("Berhasil","Limit disimpan!",[
+      {text:"OK",className:"popup-ok",onClick:()=>{ closePopup(); loadUsers(); }}
+    ]);
+  });
+}
+
+// Hapus user
+function deleteUser(userId){
+  deleteTargetUser=userId;
+  deleteAllFlag=false;
+  showPopup("Hapus User?",`User ${userId} akan dihapus permanen`,[
+    {text:"Batal",className:"popup-cancel",onClick:()=>closePopup()},
+    {text:"Hapus",className:"popup-delete",onClick:async ()=>{
+      await fetch(`${SERVER}/api/delete-user`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({id:deleteTargetUser})
+      });
+      closePopup();
+      showPopup("Berhasil",`User ${deleteTargetUser} dihapus!`,[
+        {text:"OK",className:"popup-ok",onClick:()=>{ closePopup(); loadUsers(); }}
+      ]);
+    }}
+  ]);
+}
+
+// Hapus semua user
+function deleteAllUsers(){
+  deleteAllFlag=true;
+  showPopup("Hapus Semua User?","Semua user akan dihapus permanen",[
+    {text:"Batal",className:"popup-cancel",onClick:()=>closePopup()},
+    {text:"Hapus",className:"popup-delete",onClick:async ()=>{
+      const res=await fetch(`${SERVER}/api/users`);
+      const data=await res.json();
+      for(const id in data){
+        await fetch(`${SERVER}/api/delete-user`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({id})
+        });
+      }
+      closePopup();
+      showPopup("Berhasil","Semua user dihapus!",[
+        {text:"OK",className:"popup-ok",onClick:()=>{ closePopup(); loadUsers(); }}
+      ]);
+    }}
+  ]);
+}
+
+// Logout
+function logout(){
+  localStorage.removeItem("admin");
+  window.location.href="admin.html";
+}
+
+loadUsers();
+</script>
+</body>
+</html>
