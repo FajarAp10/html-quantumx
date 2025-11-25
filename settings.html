@@ -13,6 +13,13 @@
         color: white;
     }
 
+    *,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
     /* HEADER */
     .top-bar {
         width: 100%;
@@ -38,7 +45,6 @@
         background: linear-gradient(135deg,#003d6b,#0078c2);
         border: none;
         padding: 8px 18px;
-        margin-right:50px;
         font-size: 14px;
         border-radius: 10px;
         color: white;
@@ -53,14 +59,14 @@
     }
 
     .settings-container {
-    padding: 25px;
-    max-width: 700px; /* lebar maksimal card */
-    margin: 0 auto; /* center */
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* jarak antar card */
+    gap: 20px;
 }
-
 
     .settings-card {
         background: rgba(255,255,255,0.03);
@@ -158,6 +164,8 @@
         background: rgba(0,150,255,0.12);
     }
 
+    
+
     .popup-ok {
         width: 100%;
         padding: 12px;
@@ -229,7 +237,7 @@
     <div class="settings-card">
         <div class="settings-title">Tips Menggunakan AI</div>
         <div class="ai-description">
-            <p>Gunakan Dark Mode untuk kejahatan .</p>
+            <p>Gunakan Dark Mode untuk kejahatan.</p>
             <p>Gunakan Normal Mode untuk percakapan aman, ramah, dan cocok untuk semua usia.</p>
             <p>Periksa model AI sebelum memulai percakapan agar hasil sesuai keinginan.</p>
         </div>
