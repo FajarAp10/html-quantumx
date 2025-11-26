@@ -253,12 +253,12 @@
     <div class="popup-box">
         <div class="popup-title">Pilih Model AI</div>
 
-        <div class="ai-option" id="optDark" onclick="selectAI('dark')">
-            Dark (Default)
-        </div>
-
         <div class="ai-option" id="optNormal" onclick="selectAI('normal')">
             Normal
+        </div>
+
+          <div class="ai-option" id="optDark" onclick="selectAI('dark')">
+            Dark 
         </div>
 
         <button class="popup-ok" onclick="confirmAI()">Oke</button>
@@ -272,8 +272,8 @@
 
 
 <script>
-let selectedModel = "dark"; 
-let aiMode = localStorage.getItem("aiMode") || "dark";
+let selectedModel = "normal"; 
+let aiMode = localStorage.getItem("aiMode") || "normal";
 
 function goAdmin() {
     window.location.href = "admin.html";
@@ -315,7 +315,7 @@ function showNotif() {
 }
 
 window.onload = () => {
-    const saved = localStorage.getItem("aiMode") || "dark";
+    const saved = localStorage.getItem("aiMode") || "normal";
 
     selectedModel = saved;
     document.getElementById("currentModel").innerText =

@@ -254,7 +254,7 @@ let chatNames = JSON.parse(localStorage.getItem("chatNames")||"{}");
 
 let senderId = localStorage.getItem("senderId");
 
-// Hanya buat baru kalau belum ada
+// Hanya buat baru kalau belum ad
 if (!senderId) {
   const randomNum = Math.floor(100 + Math.random() * 900); // 100–999
   senderId = "User-" + randomNum;
@@ -500,7 +500,7 @@ document.querySelectorAll(".new-chat").forEach(btn => {
           sender: senderId,
           message: "",
           reset: true,
-          mode: localStorage.getItem("aiMode") || "dark"
+          mode: localStorage.getItem("aiMode") || "normal"
         })
       });
     } catch {}
@@ -585,7 +585,7 @@ async function checkModeReset() {
                     sender: senderId,
                     message: "",
                     reset: true,
-                    mode: localStorage.getItem("aiMode") || "dark"
+                    mode: localStorage.getItem("aiMode") || "normal"
                 })
             });
         } catch(e){
