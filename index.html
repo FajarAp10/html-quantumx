@@ -190,7 +190,7 @@ h2 span {
   <button id="mobileMenuBtn" class="mobile-menu-btn">⋮</button>
   <span class="mobile-title" style="flex:1;">QuantumX</span>
   <div style="display:flex; align-items:center; gap:6px;">
-    <button id="loginBtnMobile" class="login-btn">⚙️</button>
+    <button id="loginBtnMobile" class="login-btn">⚙</button>
   </div>
 </div>
 
@@ -491,7 +491,6 @@ backdrop.addEventListener("click",()=>{overlaySidebar.classList.remove("show");b
 document.querySelectorAll(".new-chat").forEach(btn => {
   btn.addEventListener("click", async () => {
 
-    // 🔥 RESET SERVER MEMORY DENGAN MODE YANG BENAR
     try {
       await fetch(`${backendUrl}/api/ai`, {
         method: "POST",
