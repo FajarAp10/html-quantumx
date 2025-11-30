@@ -5,39 +5,339 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuantumX — AI Chat</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Inter", Arial,sans-serif;}
-body{background:#0d0d0d;color:#e6e6e6;display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:250px;background:#161616;padding:20px;border-right:1px solid #262626;display:flex;flex-direction:column;}
-.sidebar h2{font-size:20px;font-weight:700;margin-bottom:18px;}
-#limitCounter{font-weight:400;font-size:14px;color:#3b82f6;margin-left:6px;}
-.new-chat{background:#111;padding:12px;border-radius:10px;cursor:pointer;border:1px solid #262626;transition:.2s;font-size:14px;margin-bottom:12px;}
-.new-chat:hover{background:#1a1a1a;}
-.chat-list{flex:1;overflow-y:auto;margin-top:10px;}
-.chat-item{padding:10px;border-radius:8px;background:#111;margin-bottom:8px;cursor:pointer;border:1px solid #262626;transition:.2s;}
-.chat-item:hover{background:#1a1a1a;}
-.chat-wrapper{flex:1; display:flex; flex-direction:column; background:#0d0d0d; position:relative; min-height:0;}
-#chat{flex:1 1 auto; padding:22px; padding-bottom: 80px; overflow-y:auto; display:flex; flex-direction:column; position:relative; min-height:0;}
-.empty-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#7a7a7a;font-size:32px;text-align:center;line-height:1.4;pointer-events:none;opacity:0.7;transition:opacity .3s;}
-.msg{max-width:75%;padding:0;margin-bottom:14px;display:flex;flex-direction:column;align-self:flex-start;opacity:0;transform:translateY(20px);animation:fadeInUp 0.3s forwards;}
-.user{align-self:flex-end;}
-.bot{align-self:flex-start;}
-.msg-content{padding:14px 18px;line-height:1.65;font-size:15px;border-radius:14px;border:1px solid #262626;background:#111;white-space:pre-wrap;display:inline-block;max-width:100%;overflow-x:auto;word-break:break-word;}
-.user .msg-content{background:#292929;border:1px solid #333;border-radius:6px 14px 14px 6px;}
-.bot .msg-content{background:#141414;border-radius:14px 6px 6px 14px;}
-@keyframes fadeInUp{to{opacity:1;transform:translateY(0);}}
-.input-area{padding:12px 16px;background:#0d0d0d;border-top:1px solid #1a1a1a;display:flex;align-items:center;gap:8px;position:sticky; bottom:0; z-index:10;}
-.input-area input{flex:1;padding:12px 14px;border-radius:30px;border:1px solid #262626;background:#111;color:white;font-size:15px;outline:none;}
-.input-area input:focus{border-color:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,0.5);}
-.input-area button{background:#3b82f6;border:none;width:44px;height:44px;border-radius:50%;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;}
-.input-area button:hover{background:#4a8fff;transform:scale(1.1);}
-.mobile-topbar{display:none;align-items:center;gap:12px;padding:12px 16px;background:#161616;border-bottom:1px solid #262626;}
-.mobile-title{font-size:20px;font-weight:700;color:#e6e6e6;}
-.mobile-menu-btn{font-size:24px;background:#111;color:white;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;}
-.sidebar.overlay{display:none;position:fixed;top:0;left:-300px;height:100%;z-index:100;background:#161616;padding:20px;border-right:1px solid #262626;transition:left .3s;}
-.sidebar.show{left:0;}
-.sidebar-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:50;}
 /* ===========================
-   POPUP HAPUS CUSTOM
+   GLOBAL RESET & BODY
+=========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+  background: #0d0d0d;
+  color: #e6e6e6;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+.sidebar {
+  width: 250px;
+  background: #161616;
+  padding: 20px;
+  border-right: 1px solid #262626;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+#limitCounter {
+  font-weight: 400;
+  font-size: 14px;
+  color: #3b82f6;
+  margin-left: 6px;
+}
+
+.new-chat {
+  background: #111;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid #262626;
+  transition: .2s;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.new-chat:hover {
+  background: #1a1a1a;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.chat-item {
+  padding: 10px;
+  border-radius: 8px;
+  background: #111;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border: 1px solid #262626;
+  transition: .2s;
+}
+
+.chat-item:hover {
+  background: #1a1a1a;
+}
+
+/* ===========================
+   CHAT WRAPPER & MESSAGES
+=========================== */
+.chat-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+  position: relative;
+  min-height: 0;
+}
+
+#chat {
+  flex: 1 1 auto;
+  padding: 22px;
+  padding-bottom: 80px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0;
+}
+
+.empty-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #7a7a7a;
+  font-size: 32px;
+  text-align: center;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity .3s;
+}
+
+.msg {
+  max-width: 75%;
+  padding: 0;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.3s forwards;
+}
+
+.user {
+  align-self: flex-end;
+}
+
+.bot {
+  align-self: flex-start;
+}
+
+.msg-content {
+  padding: 14px 18px;
+  line-height: 1.65;
+  font-size: 15px;
+  border-radius: 14px;
+  border: 1px solid #262626;
+  background: #111;
+  white-space: pre-wrap;
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  word-break: break-word;
+}
+
+.user .msg-content {
+  background: #292929;
+  border: 1px solid #333;
+  border-radius: 6px 14px 14px 6px;
+}
+
+.bot .msg-content {
+  background: #141414;
+  border-radius: 14px 6px 6px 14px;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   INPUT AREA & BUTTONS
+=========================== */
+.input-area {
+  padding: 12px 16px;
+  background: #0d0d0d;
+  border-top: 1px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 12px 50px 12px 14px; /* beri space kanan untuk tombol kirim */
+  border-radius: 30px;
+  border: 1px solid #262626;
+  background: #111;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.input-area input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.input-area button#sendBtn {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3b82f6;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.input-area button#sendBtn:hover {
+  background: #4a8fff;
+  transform: translateY(-50%) scale(1.1); /* tetap posisinya */
+}
+
+.input-area button#sendBtn:active {
+  transform: translateY(-50%) scale(0.95); /* kecil sedikit saat klik */
+}
+
+
+.input-area button#uploadBtn {
+  width: 30px;
+  height: 30px;
+  font-size: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .2s;
+}
+
+.input-area button#uploadBtn:hover {
+  transform: scale(1.1);
+  background: #4a8fff;
+}
+
+/* ===========================
+   MOBILE TOPBAR
+=========================== */
+.mobile-topbar {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #161616;
+  border-bottom: 1px solid #262626;
+}
+
+.mobile-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e6e6e6;
+}
+
+.mobile-menu-btn {
+  font-size: 24px;
+  background: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* ===========================
+   SIDEBAR OVERLAY (MOBILE)
+=========================== */
+.sidebar.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: -300px;
+  height: 100%;
+  z-index: 100;
+  background: #161616;
+  padding: 20px;
+  border-right: 1px solid #262626;
+  transition: left .3s;
+}
+
+.sidebar.show {
+  left: 0;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 50;
+}
+
+/* ===========================
+   IMAGE PREVIEW
+=========================== */
+#imagePreviewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin: 8px 16px 0 16px;
+}
+
+/* IMAGE PREVIEW MINIMALIS */
+#imagePreviewContainer img {
+  display: block;
+  max-width: 180px;    /* lebih kecil dari sebelumnya */
+  max-height: 120px;   /* proporsional */
+  width: auto;         /* menjaga rasio */
+  height: auto;        /* menjaga rasio */
+  margin-bottom: 4px;  /* lebih rapih */
+  border-radius: 8px;  /* lebih minimalis */
+  border: 1px solid #262626;
+  object-fit: cover;   /* memastikan crop rapih kalau ukuran berbeda */
+}
+
+
+/* ===========================
+   POPUP HAPUS
 =========================== */
 .popup-backdrop {
   position: fixed;
@@ -105,13 +405,16 @@ body{background:#0d0d0d;color:#e6e6e6;display:flex;height:100vh;overflow:hidden;
   to   { transform: scale(1); opacity: 1; }
 }
 
+/* ===========================
+   BUTTONS (LOGIN / MODE)
+=========================== */
 .login-btn {
-  background: transparent; /* hilangkan background biru */
-  border: none;            /* hilangkan border */
-  padding: 0;              /* kecilkan padding */
-  font-size: 20px;         /* atur ukuran icon */
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 20px;
   cursor: pointer;
-  color: #e6e6e6;          /* warna icon, bisa disesuaikan */
+  color: #e6e6e6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,10 +422,11 @@ body{background:#0d0d0d;color:#e6e6e6;display:flex;height:100vh;overflow:hidden;
 }
 
 .login-btn:hover {
-  transform: scale(1.1);   /* efek hover ringan */
+  transform: scale(1.1);
 }
+
 .mode-btn {
-  background: #8b0000; /* default dark mode merah gelap */
+  background: #8b0000;
   color: #fff;
   border: none;
   padding: 6px 12px;
@@ -130,79 +434,50 @@ body{background:#0d0d0d;color:#e6e6e6;display:flex;height:100vh;overflow:hidden;
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.3s ease; /* animasi smooth */
+  transition: all 0.3s ease;
 }
 
-/* Hover effect */
 .mode-btn:hover {
   transform: scale(1.05);
 }
 
-/* Normal mode hijau lembut */
 .mode-btn.normal {
-  background: #2e7d32; /* hijau gelap tapi soft */
+  background: #2e7d32;
   color: #fff;
 }
 
-
-h2 span {
-  display: flex;
-  align-items: center;
-  gap: 6px; /* spasi antara nama & limit counter */
-}
-#imagePreviewContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-#imagePreviewContainer img {
-  display: block;
-  max-width: 300px; /* batasi di desktop */
-  max-height: 200px; /* batasi tinggi di desktop */
-  margin-bottom: 6px;
-  border-radius: 12px;
-  border: 1px solid #262626;
-}
-
-#uploadBtn {
-  font-size: 22px;       /* ukuran + lebih besar */
-  width: 48px;            /* ukuran tombol lebih besar */
-  height: 48px;
-  border-radius: 50%;     /* bulat */
-  border: none;
-  background: #3b82f6;    /* biru */
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-#uploadBtn:hover {
-  transform: scale(1.1);
-  background: #4a8fff;
-}
-
-
+/* ===========================
+   RESPONSIVE
+=========================== */
 @media(max-width:700px){
-  body{flex-direction:column;height:100vh;}
-  .sidebar{display:none;}
-  .sidebar.overlay{display:block;}
-  .mobile-topbar{display:flex;}
-  .chat-wrapper{min-height:0;}
-  #chat{min-height:0;}
-  .input-area{position:sticky; bottom:0;}
-  #imagePreviewContainer img {
-    max-width: 80%; /* sesuaikan dengan layar HP */
-    max-height: 200px;
-    width: auto; /* jangan paksa 100% */
+  body {
+    flex-direction: column;
+    height: 100vh;
   }
 
-  /* 🔥 FIX BUBBLE CHAT TERLALU SEMPIT DI HP */
-  .msg{max-width:95% !important;}
+  .sidebar {
+    display: none;
+  }
+
+  .sidebar.overlay {
+    display: block;
+  }
+
+  .mobile-topbar {
+    display: flex;
+  }
+
+  .chat-wrapper { min-height: 0; }
+  #chat { min-height: 0; }
+
+   #imagePreviewContainer img {
+    max-width: 60%;    /* menyesuaikan lebar layar HP */
+    max-height: 100px;
+  }
+
+  .msg { max-width: 95% !important; }
 }
+
 
 </style>
 </head>
@@ -293,6 +568,8 @@ const sendBtn = document.getElementById("sendBtn");
 const chatLists = document.querySelectorAll(".chat-list");
 const limitCounter = document.getElementById("limitCounter");
 const limitCounterOverlay = document.getElementById("limitCounterOverlay");
+
+
 
 // ===== STORAGE =====
 let chatMemory = JSON.parse(localStorage.getItem("chatMemory")||"{}");
