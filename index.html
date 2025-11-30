@@ -150,6 +150,40 @@ h2 span {
   align-items: center;
   gap: 6px; /* spasi antara nama & limit counter */
 }
+#imagePreviewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+#imagePreviewContainer img {
+  display: block;
+  max-width: 300px; /* batasi di desktop */
+  max-height: 200px; /* batasi tinggi di desktop */
+  margin-bottom: 6px;
+  border-radius: 12px;
+  border: 1px solid #262626;
+}
+
+#uploadBtn {
+  font-size: 22px;       /* ukuran + lebih besar */
+  width: 48px;            /* ukuran tombol lebih besar */
+  height: 48px;
+  border-radius: 50%;     /* bulat */
+  border: none;
+  background: #3b82f6;    /* biru */
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#uploadBtn:hover {
+  transform: scale(1.1);
+  background: #4a8fff;
+}
 
 
 @media(max-width:700px){
@@ -160,6 +194,11 @@ h2 span {
   .chat-wrapper{min-height:0;}
   #chat{min-height:0;}
   .input-area{position:sticky; bottom:0;}
+  #imagePreviewContainer img {
+    max-width: 80%; /* sesuaikan dengan layar HP */
+    max-height: 200px;
+    width: auto; /* jangan paksa 100% */
+  }
 
   /* 🔥 FIX BUBBLE CHAT TERLALU SEMPIT DI HP */
   .msg{max-width:95% !important;}
@@ -198,14 +237,21 @@ h2 span {
     <div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>
   </div>
 
+   <div id="imagePreviewContainer" style="display:none; margin:8px 16px 0 16px;">
+    <img id="imagePreview" src="" style="max-width:80%; border-radius:12px; border:1px solid #262626;" />
+    <button id="removeImageBtn" style="margin-top:6px; padding:6px 10px; border:none; border-radius:8px; cursor:pointer; background:#e53935; color:white;">Hapus</button>
+  </div>
+
   <div class="input-area">
+    <button id="uploadBtn">+</button>
     <input id="msg" placeholder="Ketik pesan..." />
     <button id="sendBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 19V5M5 12l7-7 7 7"/>
       </svg>
     </button>
-  </div>
+</div>
+
 </div>
 
 <!-- Sidebar Overlay (Mobile) -->
@@ -308,78 +354,169 @@ async function typeMessage(msgContent,text){
   }
   if(text.length>THRESHOLD){msgContent.textContent+=text.slice(THRESHOLD);chatBox.scrollTop=chatBox.scrollHeight;}
 }
+// ===== IMAGE UPLOAD =====
+const uploadBtn = document.getElementById("uploadBtn");
+const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+const imagePreview = document.getElementById("imagePreview");
+const removeImageBtn = document.getElementById("removeImageBtn");
 
-// ===== SEND MSG =====
+let selectedImage = null; // menyimpan base64
+
+uploadBtn.addEventListener("click", () => {
+    const inputFile = document.createElement("input");
+    inputFile.type = "file";
+    inputFile.accept = "image/*";
+    inputFile.click();
+
+    inputFile.onchange = () => {
+        const file = inputFile.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            selectedImage = reader.result; // base64
+            imagePreview.src = selectedImage;
+            imagePreviewContainer.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    };
+});
+
+removeImageBtn.addEventListener("click", () => {
+    selectedImage = null;
+    imagePreviewContainer.style.display = "none";
+    imagePreview.src = "";
+});
+
 
 async function sendMsg(){
-  const text = input.value.trim();
-  if(!text) return;
-  input.value = "";
+    const text = input.value.trim();
+    if(!text && !selectedImage) return;
 
-  if (!currentChatId) {
-    const newId = "chat-" + Date.now();
-    currentChatId = newId;
-    initChatMemory(currentChatId);
+    // ===== DISABLE SEND =====
+    sendBtn.disabled = true;
 
-    chatMemory[currentChatId].push({ role:"user", content:text });
+    // ===== SIMPAN UNTUK KIRIM =====
+    const imageToSend = selectedImage;
 
-    // 🔥 Generate judul otomatis
-    try {
-        const resTitle = await fetch(`${backendUrl}/api/generate-title`, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ message:text })
-    });
+    input.value = "";
 
-        const dataTitle = await resTitle.json();
-        chatNames[currentChatId] = dataTitle.title || "Obrolan Baru";
-    } catch {
-        chatNames[currentChatId] = "Obrolan Baru";
+    let isNewChat = false;
+    if (!currentChatId) {
+        const newId = "chat-" + Date.now();
+        currentChatId = newId;
+        initChatMemory(currentChatId);
+        isNewChat = true;
+    } else {
+        initChatMemory(currentChatId);
+    }
+
+    // ===== tampil message user =====
+    if(imageToSend){
+        addMessage("user",""); 
+        const lastMsg = chatBox.querySelector(".msg.user:last-child .msg-content");
+        const img = document.createElement("img");
+        img.src = imageToSend;
+        img.style.maxWidth="80%";
+        img.style.borderRadius="12px";
+        img.style.border="1px solid #262626";
+        lastMsg.appendChild(img);
+
+        chatMemory[currentChatId].push({
+            role: "user",
+            content: "[image]",
+            image: imageToSend
+        });
+
+        // HILANGKAN PREVIEW SEGERA, tapi tetap kirim
+        selectedImage = null;
+        imagePreviewContainer.style.display = "none";
+        imagePreview.src = "";
+    }
+
+    if(text){
+        addMessage("user", text);
+        chatMemory[currentChatId].push({role:"user", content:text});
+    }
+
+    if(isNewChat && (text || imageToSend)) {
+        const topic = text || "Gambar"; 
+        const title = await generateTitle(topic); 
+        chatNames[currentChatId] = title;
+        renderChatList();
+    }
+
+    saveMemory();
+
+    // ===== BOT RESPONSE =====
+    const botMsg = document.createElement("div");
+    botMsg.classList.add("msg","bot");
+    const botContent = document.createElement("div");
+    botContent.classList.add("msg-content");
+    botContent.textContent = "…";
+    botMsg.appendChild(botContent);
+    chatBox.appendChild(botMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try{
+        let payload = {sender: senderId, message: text};
+        let apiEndpoint = `${backendUrl}/api/ai`;
+
+        if(imageToSend){
+            payload.image = imageToSend;
+            apiEndpoint = `${backendUrl}/api/ai-image`;
+        }
+
+        const res = await fetch(apiEndpoint, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        botMsg.remove();
+        addMessage("bot", data.reply);
+
+        chatMemory[currentChatId].push({role:"bot", content:data.reply});
+        saveMemory();
+
+        if(data.remaining !== undefined) updateLimitUI(data.remaining);
+
+    } catch(e){
+        botMsg.remove();
+        addMessage("bot", "❌ Gagal terhubung ke server.");
+    } finally {
+        // ENABLE SEND LAGI
+        sendBtn.disabled = false;
     }
 }
- else {
-    initChatMemory(currentChatId);
-    chatMemory[currentChatId].push({role:"user", content:text});
-    if(chatNames[currentChatId]==="Obrolan Baru"){
-      chatNames[currentChatId] = text || "Obrolan Baru";
+
+
+// ===== LOAD CHAT DENGAN GAMBAR =====
+function loadChat(chatId){
+    currentChatId = chatId;
+    chatBox.innerHTML="";
+    initChatMemory(chatId);
+
+    if(chatMemory[chatId].length){
+        chatMemory[chatId].forEach(m=>{
+            if(m.image){ // kalau ada image tampil
+                addMessage("user",""); 
+                const lastMsg = chatBox.querySelector(".msg.user:last-child .msg-content");
+                const img = document.createElement("img");
+                img.src = m.image;
+                img.style.maxWidth="80%";
+                img.style.borderRadius="12px";
+                img.style.border="1px solid #262626";
+                lastMsg.appendChild(img);
+            } else {
+                addMessage(m.role==="user"?"user":"bot", m.content);
+            }
+        });
+    } else {
+        chatBox.innerHTML=`<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
     }
-  }
-
-  addMessage("user", text);
-  saveMemory(); // simpan user message
-  renderChatList();
-
-  // ===== BOT RESPONSE =====
-  const botMsg = document.createElement("div");
-  botMsg.classList.add("msg","bot");
-  const botContent = document.createElement("div");
-  botContent.classList.add("msg-content");
-  botContent.textContent = "…";
-  botMsg.appendChild(botContent);
-  chatBox.appendChild(botMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  try{
-    const res = await fetch(`${backendUrl}/api/ai`, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({sender: senderId, message: text})
-    });
-
-    const data = await res.json();
-    
-    botMsg.remove();
-    addMessage("bot", data.reply);
-
-    // **simpan bot reply ke chatMemory**
-    chatMemory[currentChatId].push({role:"bot", content:data.reply});
-    saveMemory();  // simpan ke localStorage
-
-    if(data.remaining !== undefined) updateLimitUI(data.remaining);
-  } catch(e){
-    botMsg.remove();
-    addMessage("bot", "❌ Gagal terhubung ke server.");
-  }
+    fetchLimit();
 }
 
 
@@ -400,7 +537,7 @@ function renderChatList() {
       item.classList.add("chat-item");
       item.style.display = "flex";
       item.style.alignItems = "center";
-      item.style.justContent = "space-between";
+      item.style.justifyContent = "space-between";
       item.style.padding = "10px 12px";
       item.style.borderRadius = "8px";
       item.style.cursor = "pointer";
@@ -467,25 +604,32 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
 
 
 
-// ===== LOAD CHAT =====
-function loadChat(chatId){
-  currentChatId = chatId;
-  chatBox.innerHTML="";
-  initChatMemory(chatId);
-  if(chatMemory[chatId].length){
-    chatMemory[chatId].forEach(m=>addMessage(m.role==="user"?"user":"bot",m.content));
-  } else {
-    chatBox.innerHTML=`<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
-  }
-  fetchLimit();
-}
-
 // ===== MOBILE SIDEBAR =====
 const mobileMenuBtn=document.getElementById("mobileMenuBtn");
 const overlaySidebar=document.querySelector(".sidebar.overlay");
 const backdrop=document.querySelector(".sidebar-backdrop");
 mobileMenuBtn.addEventListener("click",()=>{overlaySidebar.classList.add("show");backdrop.style.display="block";});
 backdrop.addEventListener("click",()=>{overlaySidebar.classList.remove("show");backdrop.style.display="none";});
+
+
+
+// ===== GENERATE TITLE =====
+async function generateTitle(topic) {
+    try {
+        const res = await fetch(`${backendUrl}/api/generate-title`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: topic })
+        });
+
+        const data = await res.json();
+        return data.title || "Obrolan Baru";
+    } catch (e) {
+        console.error("❌ Gagal generate title:", e);
+        return "Obrolan Baru";
+    }
+}
+
 
 
 document.querySelectorAll(".new-chat").forEach(btn => {
@@ -521,23 +665,6 @@ document.getElementById("loginBtnMobile").onclick = () => {
   window.location.href = "settings.html";
 };
 
-async function generateImage() {
-    const prompt = prompt("Masukkan deskripsi gambar:");
-    if (!prompt) return;
-
-    const res = await fetch("https://quantumx.zeabur.app/api/image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender: localStorage.getItem("senderId"), prompt })
-    });
-
-    const data = await res.json();
-    if (data.success) {
-        addMessage("bot", `<img src="${data.url}" style="max-width:250px;border-radius:12px;">`);
-    } else {
-        addMessage("bot", "❌ Gagal generate gambar.");
-    }
-}
 
 
 // ===== FETCH LIMIT =====
