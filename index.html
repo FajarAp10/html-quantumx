@@ -157,8 +157,9 @@ body {
 .user .msg-content {
   background: #292929;
   border: 1px solid #333;
-  border-radius: 6px 14px 14px 6px;
+  border-radius: 18px 18px 4px 18px;
 }
+
 
 .bot .msg-content {
   background: #141414;
@@ -446,6 +447,100 @@ body {
   color: #fff;
 }
 
+.code-block {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  padding: 14px;
+  margin-top: 8px;
+  border-radius: 12px;
+  font-family: "Consolas", monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  color: #1be600;
+}
+
+.msg.bot {
+    background: #111;
+    padding: 18px;
+    border-radius: 16px;
+    margin: 14px 0;
+    border: 1px solid #333;
+    width: fit-content;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.msg.bot .msg-content {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.loader-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;  /* ini yang bikin titik naik ke tengah */
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+ transform: translate(-4px, -10px); /* geser kiri, naik */
+}
+
+
+.loading-dots div {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: bounce 0.6s infinite alternate;
+  opacity: 0.7;
+}
+
+.loading-dots div:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.loading-dots div:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bounce {
+  from { transform: translateY(2px); opacity: 0.4; }
+  to   { transform: translateY(-4px); opacity: 1; }
+}
+
+.code-block-wrapper {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 15px;
+  right: 8px;
+  font-size: 12px;
+  background: #222;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.copy-btn:hover {
+  opacity: 1;
+}
+
+
 /* ===========================
    RESPONSIVE
 =========================== */
@@ -606,19 +701,121 @@ function updateLimitUI(limit){
   if(limitCounterOverlay) limitCounterOverlay.textContent=`(${limit})`;
 }
 
-// ===== ADD MESSAGE =====
-function addMessage(type,text){
-  const empty=chatBox.querySelector(".empty-text");
-  if(empty) empty.remove();
-  const msg=document.createElement("div");
-  msg.classList.add("msg",type);
-  const msgContent=document.createElement("div");
-  msgContent.classList.add("msg-content");
-  msg.appendChild(msgContent);
-  chatBox.appendChild(msg);
-  chatBox.scrollTop=chatBox.scrollHeight;
-  if(type==="bot"){typeMessage(msgContent,text);}else{msgContent.textContent=text;}
+
+
+async function addMessage(type, text) {
+    const empty = chatBox.querySelector(".empty-text");
+    if (empty) empty.remove();
+
+    const msg = document.createElement("div");
+    msg.classList.add("msg", type);
+
+    const parts = text.split(/```/);
+
+    for (let i = 0; i < parts.length; i++) {
+        const chunk = parts[i].trim();
+
+        if (i % 2 === 0) {
+            // TEKS
+            if (chunk !== "") {
+                const div = document.createElement("div");
+                div.classList.add("msg-content");
+                msg.appendChild(div);
+
+                await typeMessage(div, chunk);
+            }
+
+        } else {
+            // CODE BLOCK
+const wrapper = document.createElement("div");
+wrapper.classList.add("code-block-wrapper");
+
+const copyBtn = document.createElement("button");
+copyBtn.classList.add("copy-btn");
+copyBtn.textContent = "Salin";
+
+const codeDiv = document.createElement("div");
+codeDiv.classList.add("code-block");
+codeDiv.textContent = chunk;
+
+copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(chunk);
+    copyBtn.textContent = "Tersalin!";
+    setTimeout(() => copyBtn.textContent = "Salin", 1200);
+});
+
+wrapper.appendChild(copyBtn);
+wrapper.appendChild(codeDiv);
+msg.appendChild(wrapper);
+
+        }
+    }
+
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+function renderHistoryMessage(role, content, image = null) {
+    const msg = document.createElement("div");
+    msg.classList.add("msg", role);
+
+    if (image) {
+        // Pesan gambar
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("msg-content");
+
+        const img = document.createElement("img");
+        img.src = image;
+        img.style.maxWidth = "80%";
+        img.style.borderRadius = "12px";
+        img.style.border = "1px solid #262626";
+
+        contentDiv.appendChild(img);
+        msg.appendChild(contentDiv);
+    } else {
+        // Parsing text + code block
+        const parts = content.split(/```/);
+
+        for (let i = 0; i < parts.length; i++) {
+            const chunk = parts[i].trim();
+
+            if (i % 2 === 0) {
+                // TEKS
+                if (chunk !== "") {
+                    const div = document.createElement("div");
+                    div.classList.add("msg-content");
+                    div.textContent = chunk;
+                    msg.appendChild(div);
+                }
+            } else {
+                const wrapper = document.createElement("div");
+wrapper.classList.add("code-block-wrapper");
+
+const copyBtn = document.createElement("button");
+copyBtn.classList.add("copy-btn");
+copyBtn.textContent = "Salin";
+
+const codeDiv = document.createElement("div");
+codeDiv.classList.add("code-block");
+codeDiv.textContent = chunk;
+
+copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(chunk);
+    copyBtn.textContent = "Tersalin!";
+    setTimeout(() => copyBtn.textContent = "Salin", 1200);
+});
+
+wrapper.appendChild(copyBtn);
+wrapper.appendChild(codeDiv);
+msg.appendChild(wrapper);
+
+            }
+        }
+    }
+
+    chatBox.appendChild(msg);
+}
+
 
 async function typeMessage(msgContent,text){
   const THRESHOLD=40;
@@ -666,16 +863,42 @@ removeImageBtn.addEventListener("click", () => {
 });
 
 
+// helper: append user image message (synchronous)
+function appendUserImage(imageBase64){
+    const msg = document.createElement("div");
+    msg.classList.add("msg","user");
+
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+
+    const img = document.createElement("img");
+    img.src = imageBase64;
+    img.style.maxWidth = "80%";
+    img.style.borderRadius = "12px";
+    img.style.border = "1px solid #262626";
+
+    content.appendChild(img);
+    msg.appendChild(content);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+function hideEmptyText() {
+    const empty = document.querySelector(".empty-text");
+    if (empty) empty.remove();
+}
+
+
 async function sendMsg(){
+    hideEmptyText();
     const text = input.value.trim();
     if(!text && !selectedImage) return;
 
-    // ===== DISABLE SEND =====
+    // disable
     sendBtn.disabled = true;
 
-    // ===== SIMPAN UNTUK KIRIM =====
     const imageToSend = selectedImage;
-
     input.value = "";
 
     let isNewChat = false;
@@ -690,14 +913,8 @@ async function sendMsg(){
 
     // ===== tampil message user =====
     if(imageToSend){
-        addMessage("user",""); 
-        const lastMsg = chatBox.querySelector(".msg.user:last-child .msg-content");
-        const img = document.createElement("img");
-        img.src = imageToSend;
-        img.style.maxWidth="80%";
-        img.style.borderRadius="12px";
-        img.style.border="1px solid #262626";
-        lastMsg.appendChild(img);
+        // gunakan helper yang langsung append struktur pesan image
+        appendUserImage(imageToSend);
 
         chatMemory[currentChatId].push({
             role: "user",
@@ -705,32 +922,37 @@ async function sendMsg(){
             image: imageToSend
         });
 
-        // HILANGKAN PREVIEW SEGERA, tapi tetap kirim
+        // hilangkan preview
         selectedImage = null;
         imagePreviewContainer.style.display = "none";
         imagePreview.src = "";
     }
 
     if(text){
-        addMessage("user", text);
+        // PENTING: tunggu sampai addMessage menyelesaikan append & animasi type (agar urutan benar)
+        await addMessage("user", text);
         chatMemory[currentChatId].push({role:"user", content:text});
     }
 
     if(isNewChat && (text || imageToSend)) {
-        const topic = text || "Gambar"; 
-        const title = await generateTitle(topic); 
+        const topic = text || "Gambar";
+        const title = await generateTitle(topic);
         chatNames[currentChatId] = title;
         renderChatList();
     }
 
     saveMemory();
 
-    // ===== BOT RESPONSE =====
+    // ===== BOT RESPONSE (loading) =====
     const botMsg = document.createElement("div");
     botMsg.classList.add("msg","bot");
     const botContent = document.createElement("div");
     botContent.classList.add("msg-content");
-    botContent.textContent = "…";
+    botContent.innerHTML = `
+  <div class="loading-dots">
+    <div></div><div></div><div></div>
+  </div>
+`;
     botMsg.appendChild(botContent);
     chatBox.appendChild(botMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -752,9 +974,29 @@ async function sendMsg(){
 
         const data = await res.json();
         botMsg.remove();
-        addMessage("bot", data.reply);
 
-        chatMemory[currentChatId].push({role:"bot", content:data.reply});
+        const reply = data.reply || "";
+
+        // Jika ada code block, tampilkan tanpa typewriter
+        if (/```/.test(reply)) {
+            addMessage("bot", reply);
+        } else {
+            // gunakan typewriter
+            const msg = document.createElement("div");
+            msg.classList.add("msg", "bot");
+
+            const content = document.createElement("div");
+            content.classList.add("msg-content");
+            msg.appendChild(content);
+
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // efek mengetik (tidak perlu await)
+            typeMessage(content, reply);
+        }
+
+        chatMemory[currentChatId].push({role:"bot", content:reply});
         saveMemory();
 
         if(data.remaining !== undefined) updateLimitUI(data.remaining);
@@ -763,38 +1005,32 @@ async function sendMsg(){
         botMsg.remove();
         addMessage("bot", "❌ Gagal terhubung ke server.");
     } finally {
-        // ENABLE SEND LAGI
+        // enable
         sendBtn.disabled = false;
     }
 }
 
 
-// ===== LOAD CHAT DENGAN GAMBAR =====
 function loadChat(chatId){
     currentChatId = chatId;
-    chatBox.innerHTML="";
+    chatBox.innerHTML = "";
     initChatMemory(chatId);
 
     if(chatMemory[chatId].length){
-        chatMemory[chatId].forEach(m=>{
-            if(m.image){ // kalau ada image tampil
-                addMessage("user",""); 
-                const lastMsg = chatBox.querySelector(".msg.user:last-child .msg-content");
-                const img = document.createElement("img");
-                img.src = m.image;
-                img.style.maxWidth="80%";
-                img.style.borderRadius="12px";
-                img.style.border="1px solid #262626";
-                lastMsg.appendChild(img);
+        chatMemory[chatId].forEach(m => {
+            if(m.image){
+                renderHistoryMessage("user", "", m.image);  // FIX
             } else {
-                addMessage(m.role==="user"?"user":"bot", m.content);
+                renderHistoryMessage(m.role === "user" ? "user" : "bot", m.content);  // FIX
             }
         });
     } else {
-        chatBox.innerHTML=`<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
+        chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
     }
+    chatBox.scrollTop = chatBox.scrollHeight; // FIX tambahan
     fetchLimit();
 }
+
 
 
 
@@ -849,6 +1085,7 @@ function renderChatList() {
     });
   });
 }
+
 
 
 let deleteTargetChat = null;
