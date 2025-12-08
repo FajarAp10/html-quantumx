@@ -551,6 +551,7 @@ body {
   body {
     flex-direction: column;
     height: 100vh;
+    
   }
 
   .sidebar {
@@ -567,6 +568,14 @@ body {
 
   .chat-wrapper { min-height: 0; }
   #chat { min-height: 0; }
+
+
+  #imagePreviewContainer {
+    max-height: 150px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
 
    #imagePreviewContainer img {
     max-width: 60%;    /* menyesuaikan lebar layar HP */
@@ -610,7 +619,14 @@ body {
     <div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>
   </div>
 
-   <div id="imagePreviewContainer" style="display:none; margin:8px 16px 0 16px;">
+   <div id="imagePreviewContainer"
+     style="display:none;
+            margin:8px 16px 0 16px;
+            max-height:150px;
+            overflow-y:auto;
+            overflow-x:hidden;
+            padding-bottom:8px;">
+
     <img id="imagePreview" src="" style="max-width:80%; border-radius:12px; border:1px solid #262626;" />
     <button id="removeImageBtn" style="margin-top:6px; padding:6px 10px; border:none; border-radius:8px; cursor:pointer; background:#e53935; color:white;">Hapus</button>
   </div>
