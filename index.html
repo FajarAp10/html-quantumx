@@ -313,39 +313,29 @@ body {
 }
 
 /* ===========================
-   IMAGE PREVIEW
-=========================== */
+   IMAGE PREVIEW — FIX CROPPING
+   =========================== */
 #imagePreviewContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   margin: 8px 16px 0 16px;
-  max-height: 180px;
-  overflow-y: auto;
+  max-height: 200px;        /* batas tinggi area */
+  overflow-y: auto;         /* INI YANG BIKIN SCROLL */
+  padding-right: 6px;
 }
 
-/* IMAGE PREVIEW MINIMALIS */
 #imagePreviewContainer img {
   display: block;
-  max-width: 180px;    /* lebih kecil dari sebelumnya */
-  max-height: 120px;   /* proporsional */
-  width: auto;         /* menjaga rasio */
-  height: auto;        /* menjaga rasio */
-  margin-bottom: 4px;  /* lebih rapih */
-  border-radius: 8px;  /* lebih minimalis */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 180px;        /* TAK PERNAH CROP */
+  border-radius: 10px;
   border: 1px solid #262626;
-  object-fit: cover;   /* memastikan crop rapih kalau ukuran berbeda */
+  object-fit: contain;      /* ANTI CROP */
 }
-
-#removeImageBtn {
-  position: sticky;
-  bottom: 0;
-  background: #e53935;
-  padding: 6px 12px;
-  z-index: 5;
-}
-
 
 
 /* ===========================
