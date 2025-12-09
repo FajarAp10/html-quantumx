@@ -542,36 +542,6 @@ body {
   opacity: 1;
 }
 
-.dev-btn {
-    display: inline-block;
-    padding: 6px 14px;      /* ukuran kecil */
-    background: #3b82f6;
-    color: #fff;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-
-    margin-top: 8px;
-    transition: 0.2s ease;
-}
-
-/* Hover */
-.dev-btn:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-}
-
-/* Klik */
-.dev-btn:active {
-    transform: scale(0.95);
-}
-
-.limit-box {
-    display: inline-block;       /* bikin kotaknya ngepas isi */
-    text-align: center;
-    max-width: 250px;            /* batas lebar */
-}
 
 
 /* ===========================
@@ -1019,15 +989,12 @@ if (reply === "LIMIT_HABIS") {
     content.classList.add("msg-content");
 
     content.innerHTML = `
-    <div class="limit-box">
         ⚠️ Limit chat kamu habis.<br><br>
         <a href="https://wa.me/6281227298109?text=Halo%20Developer,%20saya%20mau%20isi%20limit"
            class="dev-btn" target="_blank">
             Hubungi Developer
         </a>
-    </div>
-`;
-
+    `;
 
     msg.appendChild(content);
     chatBox.appendChild(msg);
