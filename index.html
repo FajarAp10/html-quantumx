@@ -543,13 +543,30 @@ body {
 }
 
 .dev-btn {
-  display: inline-block;
-  padding: 8px 12px;
-  background: #25D366;
-  color: white;
-  border-radius: 6px;
-  font-weight: bold;
-  text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    background: #3b82f6; /* biru seperti tombol AI */
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+
+    /* posisi tengah */
+    margin-top: 10px;
+    text-align: center;
+    transition: 0.2s ease;
+}
+
+/* Hover */
+.dev-btn:hover {
+    background: #2563eb; /* biru sedikit lebih gelap */
+    transform: translateY(-1px);
+}
+
+/* Efek klik */
+.dev-btn:active {
+    transform: scale(0.95);
 }
 
 
@@ -989,6 +1006,34 @@ async function sendMsg(){
 
         const reply = data.reply || "";
 
+// ====== Cek Limit Habis ======
+if (reply === "LIMIT_HABIS") {
+    const msg = document.createElement("div");
+    msg.classList.add("msg", "bot");
+
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+
+    content.innerHTML = `
+        ⚠️ Limit chat kamu habis.<br><br>
+        <a href="https://wa.me/6281227298109?text=Halo%20Developer,%20saya%20mau%20isi%20limit"
+           class="dev-btn" target="_blank">
+            Hubungi Developer
+        </a>
+    `;
+
+    msg.appendChild(content);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    chatMemory[currentChatId].push({role:"bot", content:reply});
+    saveMemory();
+    if(data.remaining !== undefined) updateLimitUI(data.remaining);
+    return; // stop, jangan lanjut proses normal
+}
+
+
+
         // Jika ada code block, tampilkan tanpa typewriter
         if (/```/.test(reply)) {
             addMessage("bot", reply);
@@ -1022,18 +1067,6 @@ async function sendMsg(){
     }
 }
 
-if (reply === "LIMIT_HABIS") {
-    botContent.innerHTML = `
-        ⚠️ Limit chat kamu habis.<br><br>
-
-        <a href="https://wa.me/6281227298109?text=Halo%20Developer,%20saya%20mau%20isi%20limits" 
-           class="dev-btn" target="_blank">
-            Hubungi Developer
-        </a>
-    `;
-} else {
-    botContent.textContent = reply;
-}
 
 
 function loadChat(chatId){
