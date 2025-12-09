@@ -980,23 +980,36 @@ async function sendMsg(){
         const reply = data.reply || "";
 
         // Jika ada code block, tampilkan tanpa typewriter
-        if (/```/.test(reply)) {
-            addMessage("bot", reply);
-        } else {
-            // gunakan typewriter
-            const msg = document.createElement("div");
-            msg.classList.add("msg", "bot");
+        // Jika reply mengandung HTML khusus limit
+if (reply.trim().startsWith("<div")) {
+    const msg = document.createElement("div");
+    msg.classList.add("msg", "bot");
 
-            const content = document.createElement("div");
-            content.classList.add("msg-content");
-            msg.appendChild(content);
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+    content.innerHTML = reply; // ← render HTML asli
 
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
+    msg.appendChild(content);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-            // efek mengetik (tidak perlu await)
-            typeMessage(content, reply);
-        }
+} else if (/```/.test(reply)) {
+    addMessage("bot", reply);
+} else {
+    // gunakan typewriter
+    const msg = document.createElement("div");
+    msg.classList.add("msg", "bot");
+
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+    msg.appendChild(content);
+
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    typeMessage(content, reply);
+}
+
 
         chatMemory[currentChatId].push({role:"bot", content:reply});
         saveMemory();
