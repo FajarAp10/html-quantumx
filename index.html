@@ -543,7 +543,6 @@ body {
 }
 
 
-
 /* ===========================
    RESPONSIVE
 =========================== */
@@ -980,34 +979,6 @@ async function sendMsg(){
 
         const reply = data.reply || "";
 
-// ====== Cek Limit Habis ======
-if (reply === "LIMIT_HABIS") {
-    const msg = document.createElement("div");
-    msg.classList.add("msg", "bot");
-
-    const content = document.createElement("div");
-    content.classList.add("msg-content");
-
-    content.innerHTML = `
-        ⚠️ Limit chat kamu habis.<br><br>
-        <a href="https://wa.me/6281227298109?text=Halo%20Developer,%20saya%20mau%20isi%20limit"
-           class="dev-btn" target="_blank">
-            Hubungi Developer
-        </a>
-    `;
-
-    msg.appendChild(content);
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    chatMemory[currentChatId].push({role:"bot", content:reply});
-    saveMemory();
-    if(data.remaining !== undefined) updateLimitUI(data.remaining);
-    return; // stop, jangan lanjut proses normal
-}
-
-
-
         // Jika ada code block, tampilkan tanpa typewriter
         if (/```/.test(reply)) {
             addMessage("bot", reply);
@@ -1040,7 +1011,6 @@ if (reply === "LIMIT_HABIS") {
         sendBtn.disabled = false;
     }
 }
-
 
 
 function loadChat(chatId){
