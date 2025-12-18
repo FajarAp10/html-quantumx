@@ -757,6 +757,38 @@ msg.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function appendAdminButtonMessage() {
+    const msg = document.createElement("div");
+    msg.classList.add("msg", "bot");
+
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+
+    const btn = document.createElement("button");
+    btn.textContent = "Hubungi Admin";
+    btn.style.padding = "10px 16px";
+    btn.style.borderRadius = "12px";
+    btn.style.border = "none";
+    btn.style.background = "#3b82f6";
+    btn.style.color = "white";
+    btn.style.cursor = "pointer";
+    btn.style.fontWeight = "700";
+    btn.style.fontSize = "14px";
+
+    btn.addEventListener("click", () => {
+        window.open(
+            "https://wa.me/62XXXXXXXXXX?text=" + encodeURIComponent("Halo admin, saya mau isi limit"),
+            "_blank"
+        );
+    });
+
+    content.appendChild(btn);
+    msg.appendChild(content);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
 function renderHistoryMessage(role, content, image = null) {
     const msg = document.createElement("div");
     msg.classList.add("msg", role);
