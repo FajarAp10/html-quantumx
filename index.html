@@ -321,7 +321,12 @@ body {
   align-items: center;
   position: relative;
   margin: 8px 16px 0 16px;
+
+  max-height: 160px;          /* ⬅️ batas tinggi preview */
+  overflow-y: auto;           /* ⬅️ BISA SCROLL */
+  -webkit-overflow-scrolling: touch;
 }
+
 
 /* IMAGE PREVIEW MINIMALIS */
 #imagePreviewContainer img {
@@ -483,41 +488,58 @@ body {
 }
 
 
-.loader-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;  /* ini yang bikin titik naik ke tengah */
-}
-
+/* ===== LOADING DOTS ===== */
 .loading-dots {
-  display: inline-flex;
-  gap: 4px;
- transform: translate(-4px, -10px); /* geser kiri, naik */
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 16px;
 }
 
-
-.loading-dots div {
+.loading-dots span {
   width: 6px;
   height: 6px;
-  background: #fff;
+  background: #aaa;
   border-radius: 50%;
-  animation: bounce 0.6s infinite alternate;
-  opacity: 0.7;
+  animation: dotPulse 1.4s infinite ease-in-out;
+  opacity: 0.2;
 }
 
-.loading-dots div:nth-child(2) {
-  animation-delay: 0.15s;
+.loading-dots span:nth-child(1) {
+  animation-delay: 0s;
 }
-.loading-dots div:nth-child(3) {
-  animation-delay: 0.3s;
+.loading-dots span:nth-child(2) {
+  animation-delay: .2s;
+}
+.loading-dots span:nth-child(3) {
+  animation-delay: .4s;
 }
 
-@keyframes bounce {
-  from { transform: translateY(2px); opacity: 0.4; }
-  to   { transform: translateY(-4px); opacity: 1; }
+@keyframes dotPulse {
+  0%   { opacity: 0.2; transform: translateY(0); }
+  20%  { opacity: 1;   transform: translateY(-3px); }
+  40%  { opacity: 0.2; transform: translateY(0); }
+  100% { opacity: 0.2; transform: translateY(0); }
 }
+
+/* ANTI BULET HANTU */
+.msg-content:empty {
+  display: none;
+}
+
+/* ===== KHUSUS BUBBLE YANG ADA LOADING DOTS ===== */
+.msg.bot:has(.loading-dots) {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* pastikan loading tidak nambah tinggi dari dalam */
+.msg.bot:has(.loading-dots) .msg-content {
+  padding: 0 !important;
+}
+
 
 .code-block-wrapper {
   position: relative;
@@ -569,6 +591,10 @@ body {
   body {
     flex-direction: column;
     height: 100vh;
+  }
+
+   #imagePreviewContainer {
+    max-height: 140px;
   }
 
   .sidebar {
@@ -693,6 +719,8 @@ let chatNames = JSON.parse(localStorage.getItem("chatNames")||"{}");
 
 let senderId = localStorage.getItem("senderId");
 
+
+
 // Hanya buat baru kalau belum ad
 if (!senderId) {
   const randomNum = Math.floor(100 + Math.random() * 900); // 100–999
@@ -775,13 +803,11 @@ msg.appendChild(wrapper);
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 function renderHistoryMessage(role, content, image = null) {
     const msg = document.createElement("div");
     msg.classList.add("msg", role);
 
     if (image) {
-        // Pesan gambar
         const contentDiv = document.createElement("div");
         contentDiv.classList.add("msg-content");
 
@@ -794,49 +820,52 @@ function renderHistoryMessage(role, content, image = null) {
         contentDiv.appendChild(img);
         msg.appendChild(contentDiv);
     } else {
-        // Parsing text + code block
         const parts = content.split(/```/);
 
         for (let i = 0; i < parts.length; i++) {
             const chunk = parts[i].trim();
 
             if (i % 2 === 0) {
-                // TEKS
                 if (chunk !== "") {
                     const div = document.createElement("div");
                     div.classList.add("msg-content");
-                    div.textContent = chunk;
+
+                    // 🔥 FIX BUTTON / HTML
+                    if (chunk.startsWith("<div")) {
+                        div.innerHTML = chunk;
+                    } else {
+                        div.textContent = chunk;
+                    }
+
                     msg.appendChild(div);
                 }
             } else {
                 const wrapper = document.createElement("div");
-wrapper.classList.add("code-block-wrapper");
+                wrapper.classList.add("code-block-wrapper");
 
-const copyBtn = document.createElement("button");
-copyBtn.classList.add("copy-btn");
-copyBtn.textContent = "Salin";
+                const copyBtn = document.createElement("button");
+                copyBtn.classList.add("copy-btn");
+                copyBtn.textContent = "Salin";
 
-const codeDiv = document.createElement("div");
-codeDiv.classList.add("code-block");
-codeDiv.textContent = chunk;
+                const codeDiv = document.createElement("div");
+                codeDiv.classList.add("code-block");
+                codeDiv.textContent = chunk;
 
-copyBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(chunk);
-    copyBtn.textContent = "Tersalin!";
-    setTimeout(() => copyBtn.textContent = "Salin", 1200);
-});
+                copyBtn.addEventListener("click", () => {
+                    navigator.clipboard.writeText(chunk);
+                    copyBtn.textContent = "Tersalin!";
+                    setTimeout(() => copyBtn.textContent = "Salin", 1200);
+                });
 
-wrapper.appendChild(copyBtn);
-wrapper.appendChild(codeDiv);
-msg.appendChild(wrapper);
-
+                wrapper.appendChild(copyBtn);
+                wrapper.appendChild(codeDiv);
+                msg.appendChild(wrapper);
             }
         }
     }
 
     chatBox.appendChild(msg);
 }
-
 
 async function typeMessage(msgContent,text){
   const THRESHOLD=40;
@@ -905,6 +934,46 @@ function appendUserImage(imageBase64){
 }
 
 
+async function renderBotMessageWithCode(msg, text) {
+    const parts = text.split(/```/);
+
+    for (let i = 0; i < parts.length; i++) {
+        const chunk = parts[i].trim();
+        if (!chunk) continue;
+
+        if (i % 2 === 0) {
+            // TEXT
+            const div = document.createElement("div");
+            div.classList.add("msg-content");
+            msg.appendChild(div);
+            await typeMessage(div, chunk);
+        } else {
+            // CODE
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("code-block-wrapper");
+
+            const copyBtn = document.createElement("button");
+            copyBtn.classList.add("copy-btn");
+            copyBtn.textContent = "Salin";
+
+            const codeDiv = document.createElement("div");
+            codeDiv.classList.add("code-block");
+            codeDiv.textContent = chunk;
+
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(chunk);
+                copyBtn.textContent = "Tersalin!";
+                setTimeout(() => copyBtn.textContent = "Salin", 1200);
+            };
+
+            wrapper.appendChild(copyBtn);
+            wrapper.appendChild(codeDiv);
+            msg.appendChild(wrapper);
+        }
+    }
+}
+
+
 function hideEmptyText() {
     const empty = document.querySelector(".empty-text");
     if (empty) empty.remove();
@@ -912,6 +981,7 @@ function hideEmptyText() {
 
 async function sendMsg() {
     hideEmptyText();
+
     const text = input.value.trim();
     if (!text && !selectedImage) return;
 
@@ -925,12 +995,15 @@ async function sendMsg() {
         const newId = "chat-" + Date.now();
         currentChatId = newId;
         initChatMemory(currentChatId);
+
+          localStorage.setItem("activeChatId", currentChatId);
+
         isNewChat = true;
     } else {
         initChatMemory(currentChatId);
     }
 
-    // ===== tampil message user =====
+    // ===== USER MESSAGE =====
     if (imageToSend) {
         appendUserImage(imageToSend);
         chatMemory[currentChatId].push({
@@ -958,12 +1031,18 @@ async function sendMsg() {
 
     saveMemory();
 
-    // ===== BOT RESPONSE (loading) =====
+    // ===== BOT LOADING (SATU BUBBLE) =====
     const botMsg = document.createElement("div");
     botMsg.classList.add("msg", "bot");
+
     const botContent = document.createElement("div");
     botContent.classList.add("msg-content");
-    botContent.innerHTML = `<div class="loading-dots"><div></div><div></div><div></div></div>`;
+    botContent.innerHTML = `
+        <div class="loading-dots">
+            <span></span><span></span><span></span>
+        </div>
+    `;
+
     botMsg.appendChild(botContent);
     chatBox.appendChild(botMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -986,15 +1065,21 @@ async function sendMsg() {
         if (!res.ok) throw new Error("HTTP error");
 
         const data = await res.json();
-        botMsg.remove();
 
         // ===== MULTI REPLY =====
         if (Array.isArray(data.replies)) {
+            botMsg.remove(); // loading khusus single reply
+
             for (const r of data.replies) {
+                if (!r.content || !r.content.trim()) continue;
+
                 const msg = document.createElement("div");
                 msg.classList.add("msg", "bot");
+
                 const content = document.createElement("div");
                 content.classList.add("msg-content");
+                msg.appendChild(content);
+                chatBox.appendChild(msg);
 
                 if (r.type === "buttons") {
                     content.innerHTML = r.content;
@@ -1002,32 +1087,38 @@ async function sendMsg() {
                     await typeMessage(content, r.content);
                 }
 
-                msg.appendChild(content);
-                chatBox.appendChild(msg);
                 chatBox.scrollTop = chatBox.scrollHeight;
+                chatMemory[currentChatId].push({ role: "bot", content: r.content });
             }
+
+            saveMemory();
             if (data.remaining !== undefined) updateLimitUI(data.remaining);
             return;
         }
+// ===== SINGLE REPLY =====
+const reply = data.reply || "";
 
-        // ===== SINGLE REPLY =====
-        const reply = data.reply || "";
+if (!reply.trim()) {
+    botMsg.remove();
+    return;
+}
 
-        const msg = document.createElement("div");
-        msg.classList.add("msg", "bot");
-        const content = document.createElement("div");
-        content.classList.add("msg-content");
-        msg.appendChild(content);
-        chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
+// GANTI LOADING → ISI PESAN
+botContent.innerHTML = "";
 
-        if (reply.trim().startsWith("<div")) {
-            content.innerHTML = reply;
-        } else if (/```/.test(reply)) {
-            await addMessage("bot", reply);
-        } else {
-            await typeMessage(content, reply);
-        }
+// 1️⃣ HTML (BUTTON, LIMIT, DLL)
+if (reply.trim().startsWith("<")) {
+    botContent.innerHTML = reply;
+}
+// 2️⃣ ADA CODE BLOCK ```
+else if (reply.includes("```")) {
+    await renderBotMessageWithCode(botContent, reply);
+}
+// 3️⃣ TEKS BIASA
+else {
+    await typeMessage(botContent, reply);
+}
+
 
         chatMemory[currentChatId].push({ role: "bot", content: reply });
         saveMemory();
@@ -1043,29 +1134,33 @@ async function sendMsg() {
 }
 
 
-
 function loadChat(chatId){
     currentChatId = chatId;
+
+    // simpan chat aktif
+    localStorage.setItem("activeChatId", chatId);
+
     chatBox.innerHTML = "";
     initChatMemory(chatId);
 
-    if(chatMemory[chatId].length){
+    if (chatMemory[chatId].length) {
         chatMemory[chatId].forEach(m => {
-            if(m.image){
-                renderHistoryMessage("user", "", m.image);  // FIX
+            if (m.image) {
+                renderHistoryMessage("user", "", m.image);
             } else {
-                renderHistoryMessage(m.role === "user" ? "user" : "bot", m.content);  // FIX
+                renderHistoryMessage(
+                    m.role === "user" ? "user" : "bot",
+                    m.content
+                );
             }
         });
     } else {
         chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
     }
-    chatBox.scrollTop = chatBox.scrollHeight; // FIX tambahan
+
+    chatBox.scrollTop = chatBox.scrollHeight;
     fetchLimit();
 }
-
-
-
 
 function renderChatList() {
   chatLists.forEach(list => {
@@ -1139,7 +1234,10 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
   delete chatMemory[deleteTargetChat];
   delete chatNames[deleteTargetChat];
 
-  if (currentChatId === deleteTargetChat) currentChatId = null;
+  if (currentChatId === deleteTargetChat) {
+    currentChatId = null;
+    localStorage.removeItem("activeChatId");
+}
 
   saveMemory();
   renderChatList();
@@ -1197,6 +1295,8 @@ document.querySelectorAll(".new-chat").forEach(btn => {
 
     // 🟢 RESET LOCAL CHAT
     currentChatId = null;
+    localStorage.removeItem("activeChatId");
+
 
     // 🟢 TAMPILKAN HOME
     chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
@@ -1237,11 +1337,19 @@ function saveMemory(){
 
 // ===== INIT =====
 renderChatList();
-if(Object.keys(chatMemory).length>0){
-  loadChat(Object.keys(chatMemory)[0]);
+
+const activeChatId = localStorage.getItem("activeChatId");
+
+if (activeChatId && chatMemory[activeChatId]) {
+    loadChat(activeChatId);
+} else if (Object.keys(chatMemory).length > 0) {
+    const lastChat = Object.keys(chatMemory).slice(-1)[0];
+    loadChat(lastChat);
 } else {
-  currentChatId = null;
+    currentChatId = null;
+    chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
 }
+
 sendBtn.addEventListener("click",sendMsg);
 input.addEventListener("keydown",(e)=>{if(e.key==="Enter") sendMsg();});
 fetchLimit();
@@ -1266,8 +1374,11 @@ async function checkModeReset() {
         }
 
         currentChatId = null;
-        chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
-        renderChatList();
+localStorage.removeItem("activeChatId");
+
+chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
+renderChatList();
+
 
         localStorage.removeItem("aiShouldReset");
     }
