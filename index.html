@@ -910,10 +910,10 @@ function hideEmptyText() {
     if (empty) empty.remove();
 }
 
-async function sendMsg(){
+async function sendMsg() {
     hideEmptyText();
     const text = input.value.trim();
-    if(!text && !selectedImage) return;
+    if (!text && !selectedImage) return;
 
     sendBtn.disabled = true;
 
@@ -922,75 +922,77 @@ async function sendMsg(){
 
     let isNewChat = false;
     if (!currentChatId) {
-        currentChatId = "chat-" + Date.now();
+        const newId = "chat-" + Date.now();
+        currentChatId = newId;
         initChatMemory(currentChatId);
         isNewChat = true;
     } else {
         initChatMemory(currentChatId);
     }
 
-    // ===== USER MESSAGE =====
-    if(imageToSend){
+    // ===== tampil message user =====
+    if (imageToSend) {
         appendUserImage(imageToSend);
         chatMemory[currentChatId].push({
             role: "user",
             content: "[image]",
             image: imageToSend
         });
+
         selectedImage = null;
         imagePreviewContainer.style.display = "none";
         imagePreview.src = "";
     }
 
-    if(text){
+    if (text) {
         await addMessage("user", text);
-        chatMemory[currentChatId].push({ role:"user", content:text });
+        chatMemory[currentChatId].push({ role: "user", content: text });
     }
 
-    if(isNewChat && (text || imageToSend)){
-        const title = await generateTitle(text || "Gambar");
+    if (isNewChat && (text || imageToSend)) {
+        const topic = text || "Gambar";
+        const title = await generateTitle(topic);
         chatNames[currentChatId] = title;
         renderChatList();
     }
 
     saveMemory();
 
-    // ===== LOADING BOT =====
+    // ===== BOT RESPONSE (loading) =====
     const botMsg = document.createElement("div");
-    botMsg.classList.add("msg","bot");
-    botMsg.innerHTML = `
-      <div class="msg-content">
-        <div class="loading-dots"><div></div><div></div><div></div></div>
-      </div>`;
+    botMsg.classList.add("msg", "bot");
+    const botContent = document.createElement("div");
+    botContent.classList.add("msg-content");
+    botContent.innerHTML = `<div class="loading-dots"><div></div><div></div><div></div></div>`;
+    botMsg.appendChild(botContent);
     chatBox.appendChild(botMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
         let payload = { sender: senderId, message: text };
-        let endpoint = `${backendUrl}/api/ai`;
+        let apiEndpoint = `${backendUrl}/api/ai`;
 
-        if(imageToSend){
+        if (imageToSend) {
             payload.image = imageToSend;
-            endpoint = `${backendUrl}/api/ai-image`;
+            apiEndpoint = `${backendUrl}/api/ai-image`;
         }
 
-        const res = await fetch(endpoint, {
+        const res = await fetch(apiEndpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
 
         if (!res.ok) throw new Error("HTTP error");
+
         const data = await res.json();
+        botMsg.remove();
 
-        if (botMsg.parentNode) botMsg.remove();
-
-        // ===== MULTI REPLY (LIMIT) =====
+        // ===== MULTI REPLY =====
         if (Array.isArray(data.replies)) {
             for (const r of data.replies) {
                 const msg = document.createElement("div");
-                msg.classList.add("msg","bot");
-
+                msg.classList.add("msg", "bot");
                 const content = document.createElement("div");
                 content.classList.add("msg-content");
 
@@ -1002,39 +1004,39 @@ async function sendMsg(){
 
                 msg.appendChild(content);
                 chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
-
-            chatBox.scrollTop = chatBox.scrollHeight;
             if (data.remaining !== undefined) updateLimitUI(data.remaining);
             return;
         }
 
         // ===== SINGLE REPLY =====
         const reply = data.reply || "";
-        const msg = document.createElement("div");
-        msg.classList.add("msg","bot");
 
+        const msg = document.createElement("div");
+        msg.classList.add("msg", "bot");
         const content = document.createElement("div");
         content.classList.add("msg-content");
         msg.appendChild(content);
         chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
         if (reply.trim().startsWith("<div")) {
             content.innerHTML = reply;
         } else if (/```/.test(reply)) {
-            addMessage("bot", reply);
+            await addMessage("bot", reply);
         } else {
             await typeMessage(content, reply);
         }
 
-        chatMemory[currentChatId].push({ role:"bot", content: reply });
+        chatMemory[currentChatId].push({ role: "bot", content: reply });
         saveMemory();
-
         if (data.remaining !== undefined) updateLimitUI(data.remaining);
 
     } catch (e) {
         console.error(e);
-        addMessage("bot", "❌ Gagal terhubung ke server.");
+        botMsg.remove();
+        await addMessage("bot", "❌ Gagal terhubung ke server.");
     } finally {
         sendBtn.disabled = false;
     }
