@@ -15,13 +15,20 @@
   font-family: "Inter", Arial, sans-serif;
 }
 
+html, body {
+  height: 100%;
+}
+
+
 body {
   background: #0d0d0d;
   color: #e6e6e6;
   display: flex;
-  height: 100dvh;        /* ⬅️ FIX MOBILE */
-  overflow: hidden;     /* tetap */
+  height: 100dvh;
+  overflow: auto;              /* ✅ BOLEH */
+  overscroll-behavior: none;
 }
+
 
 
 /* ===========================
@@ -91,10 +98,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #0d0d0d;
-  position: relative;
-  min-height: 0;
+  min-height: 0;              /* 🔥 WAJIB */
+  overflow: hidden;           /* 🔒 kunci di sini */
 }
+
 
 #chat {
   flex: 1 1 auto;
@@ -105,7 +112,9 @@ body {
   flex-direction: column;
   position: relative;
   min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
+
 
 .empty-text {
   position: absolute;
@@ -327,13 +336,10 @@ body {
   overflow-y: auto;
 
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y; /* ⬅️ INI YANG KURANG */
-}
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 
-
-#chat {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
 
