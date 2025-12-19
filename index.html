@@ -542,6 +542,26 @@ body {
   opacity: 1;
 }
 
+.limit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.limit-buttons button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.limit-buttons button:hover {
+  background: #4a8fff;
+}
+
 
 /* ===========================
    RESPONSIVE
@@ -756,38 +776,6 @@ msg.appendChild(wrapper);
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-function appendAdminButtonMessage() {
-    const msg = document.createElement("div");
-    msg.classList.add("msg", "bot");
-
-    const content = document.createElement("div");
-    content.classList.add("msg-content");
-
-    const btn = document.createElement("button");
-    btn.textContent = "Hubungi Admin";
-    btn.style.padding = "10px 16px";
-    btn.style.borderRadius = "12px";
-    btn.style.border = "none";
-    btn.style.background = "#3b82f6";
-    btn.style.color = "white";
-    btn.style.cursor = "pointer";
-    btn.style.fontWeight = "700";
-    btn.style.fontSize = "14px";
-
-    btn.addEventListener("click", () => {
-        window.open(
-            "https://wa.me/62XXXXXXXXXX?text=" + encodeURIComponent("Halo admin, saya mau isi limit"),
-            "_blank"
-        );
-    });
-
-    content.appendChild(btn);
-    msg.appendChild(content);
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
 
 function renderHistoryMessage(role, content, image = null) {
     const msg = document.createElement("div");
@@ -1009,7 +997,30 @@ async function sendMsg(){
         const data = await res.json();
         botMsg.remove();
 
-        const reply = data.reply || "";
+        // ===== HANDLE MULTI REPLY =====
+if (Array.isArray(data.replies)) {
+    for (const r of data.replies) {
+        const msg = document.createElement("div");
+        msg.classList.add("msg", "bot");
+
+        const content = document.createElement("div");
+        content.classList.add("msg-content");
+
+        if (r.type === "buttons") {
+            content.innerHTML = r.content;
+        } else {
+            await typeMessage(content, r.content);
+        }
+
+        msg.appendChild(content);
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    if (data.remaining !== undefined) updateLimitUI(data.remaining);
+    return;
+}
+
 
         // Jika ada code block, tampilkan tanpa typewriter
         // Jika reply mengandung HTML khusus limit
