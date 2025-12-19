@@ -20,14 +20,19 @@ html, body {
 }
 
 
+html, body {
+  height: 100%;
+}
+
 body {
   background: #0d0d0d;
   color: #e6e6e6;
   display: flex;
-  height: 100dvh;
-  overflow: auto;              /* ✅ BOLEH */
+  height: 100%;              /* ⬅️ BUKAN 100dvh */
+  overflow: hidden;          /* ⬅️ PENTING */
   overscroll-behavior: none;
 }
+
 
 
 
@@ -605,7 +610,7 @@ body {
 @media(max-width:700px){
   body {
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
   }
 
    #imagePreviewContainer {
