@@ -910,13 +910,11 @@ function hideEmptyText() {
     if (empty) empty.remove();
 }
 
-
 async function sendMsg(){
     hideEmptyText();
     const text = input.value.trim();
     if(!text && !selectedImage) return;
 
-    // disable
     sendBtn.disabled = true;
 
     const imageToSend = selectedImage;
@@ -924,206 +922,124 @@ async function sendMsg(){
 
     let isNewChat = false;
     if (!currentChatId) {
-        const newId = "chat-" + Date.now();
-        currentChatId = newId;
+        currentChatId = "chat-" + Date.now();
         initChatMemory(currentChatId);
         isNewChat = true;
     } else {
         initChatMemory(currentChatId);
     }
 
-    // ===== tampil message user =====
+    // ===== USER MESSAGE =====
     if(imageToSend){
-        // gunakan helper yang langsung append struktur pesan image
         appendUserImage(imageToSend);
-
         chatMemory[currentChatId].push({
             role: "user",
             content: "[image]",
             image: imageToSend
         });
-
-        // hilangkan preview
         selectedImage = null;
         imagePreviewContainer.style.display = "none";
         imagePreview.src = "";
     }
 
     if(text){
-        // PENTING: tunggu sampai addMessage menyelesaikan append & animasi type (agar urutan benar)
         await addMessage("user", text);
-        chatMemory[currentChatId].push({role:"user", content:text});
+        chatMemory[currentChatId].push({ role:"user", content:text });
     }
 
-    if(isNewChat && (text || imageToSend)) {
-        const topic = text || "Gambar";
-        const title = await generateTitle(topic);
+    if(isNewChat && (text || imageToSend)){
+        const title = await generateTitle(text || "Gambar");
         chatNames[currentChatId] = title;
         renderChatList();
     }
 
     saveMemory();
 
-    // ===== BOT RESPONSE (loading) =====
+    // ===== LOADING BOT =====
     const botMsg = document.createElement("div");
     botMsg.classList.add("msg","bot");
-    const botContent = document.createElement("div");
-    botContent.classList.add("msg-content");
-    botContent.innerHTML = `
-  <div class="loading-dots">
-    <div></div><div></div><div></div>
-  </div>
-`;
-    botMsg.appendChild(botContent);
+    botMsg.innerHTML = `
+      <div class="msg-content">
+        <div class="loading-dots"><div></div><div></div><div></div></div>
+      </div>`;
     chatBox.appendChild(botMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    try{
-        let payload = {sender: senderId, message: text};
-        let apiEndpoint = `${backendUrl}/api/ai`;
+    try {
+        let payload = { sender: senderId, message: text };
+        let endpoint = `${backendUrl}/api/ai`;
 
         if(imageToSend){
             payload.image = imageToSend;
-            apiEndpoint = `${backendUrl}/api/ai-image`;
+            endpoint = `${backendUrl}/api/ai-image`;
         }
 
-        const res = await fetch(apiEndpoint, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload)
-});
+        const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
 
-if (!res.ok) throw new Error("HTTP error");
+        if (!res.ok) throw new Error("HTTP error");
+        const data = await res.json();
 
-const data = await res.json();
+        if (botMsg.parentNode) botMsg.remove();
 
-// ⛔ pastikan loader SELALU dihapus
-if (botMsg && botMsg.parentNode) botMsg.remove();
+        // ===== MULTI REPLY (LIMIT) =====
+        if (Array.isArray(data.replies)) {
+            for (const r of data.replies) {
+                const msg = document.createElement("div");
+                msg.classList.add("msg","bot");
 
-/* =============================
-   HANDLE MULTI-REPLIES (LIMIT)
-============================= */
-if (Array.isArray(data.replies)) {
-  for (const r of data.replies) {
-    const msg = document.createElement("div");
-    msg.classList.add("msg", "bot");
+                const content = document.createElement("div");
+                content.classList.add("msg-content");
 
-    const content = document.createElement("div");
-    content.classList.add("msg-content");
+                if (r.type === "buttons") {
+                    content.innerHTML = r.content;
+                } else {
+                    await typeMessage(content, r.content);
+                }
 
-    if (r.type === "buttons") {
-      content.innerHTML = r.content;
-    } else {
-      await typeMessage(content, r.content);
-    }
+                msg.appendChild(content);
+                chatBox.appendChild(msg);
+            }
 
-    msg.appendChild(content);
-    chatBox.appendChild(msg);
-  }
+            chatBox.scrollTop = chatBox.scrollHeight;
+            if (data.remaining !== undefined) updateLimitUI(data.remaining);
+            return;
+        }
 
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  if (data.remaining !== undefined) updateLimitUI(data.remaining);
-
-  // ✅ JANGAN LANJUT KE LOGIC reply
-  return;
-}
-
-/* =============================
-   NORMAL SINGLE REPLY
-============================= */
-const reply = data.reply || "";
-
-if (/```/.test(reply)) {
-  addMessage("bot", reply);
-} else {
-  const msg = document.createElement("div");
-  msg.classList.add("msg", "bot");
-
-  const content = document.createElement("div");
-  content.classList.add("msg-content");
-  msg.appendChild(content);
-  chatBox.appendChild(msg);
-
-  typeMessage(content, reply);
-}
-
-chatMemory[currentChatId].push({ role: "bot", content: reply });
-saveMemory();
-
-if (data.remaining !== undefined) updateLimitUI(data.remaining);
-
-
-        // ===== HANDLE MULTI REPLY =====
-if (Array.isArray(data.replies)) {
-    for (const r of data.replies) {
+        // ===== SINGLE REPLY =====
+        const reply = data.reply || "";
         const msg = document.createElement("div");
-        msg.classList.add("msg", "bot");
+        msg.classList.add("msg","bot");
 
         const content = document.createElement("div");
         content.classList.add("msg-content");
-
-        if (r.type === "buttons") {
-            content.innerHTML = r.content;
-        } else {
-            await typeMessage(content, r.content);
-        }
-
         msg.appendChild(content);
         chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
 
-    if (data.remaining !== undefined) updateLimitUI(data.remaining);
-    return;
-}
+        if (reply.trim().startsWith("<div")) {
+            content.innerHTML = reply;
+        } else if (/```/.test(reply)) {
+            addMessage("bot", reply);
+        } else {
+            await typeMessage(content, reply);
+        }
 
-
-        // Jika ada code block, tampilkan tanpa typewriter
-        // Jika reply mengandung HTML khusus limit
-if (reply.trim().startsWith("<div")) {
-    const msg = document.createElement("div");
-    msg.classList.add("msg", "bot");
-
-    const content = document.createElement("div");
-    content.classList.add("msg-content");
-    content.innerHTML = reply; // ← render HTML asli
-
-    msg.appendChild(content);
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-} else if (/```/.test(reply)) {
-    addMessage("bot", reply);
-} else {
-    // gunakan typewriter
-    const msg = document.createElement("div");
-    msg.classList.add("msg", "bot");
-
-    const content = document.createElement("div");
-    content.classList.add("msg-content");
-    msg.appendChild(content);
-
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    typeMessage(content, reply);
-}
-
-
-        chatMemory[currentChatId].push({role:"bot", content:reply});
+        chatMemory[currentChatId].push({ role:"bot", content: reply });
         saveMemory();
 
-        if(data.remaining !== undefined) updateLimitUI(data.remaining);
+        if (data.remaining !== undefined) updateLimitUI(data.remaining);
 
-    } catch(e){
-        botMsg.remove();
+    } catch (e) {
+        console.error(e);
         addMessage("bot", "❌ Gagal terhubung ke server.");
     } finally {
-        // enable
         sendBtn.disabled = false;
     }
 }
+
 
 
 function loadChat(chatId){
