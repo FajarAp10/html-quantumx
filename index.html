@@ -988,13 +988,71 @@ async function sendMsg(){
         }
 
         const res = await fetch(apiEndpoint, {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify(payload)
-        });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+});
 
-        const data = await res.json();
-        botMsg.remove();
+if (!res.ok) throw new Error("HTTP error");
+
+const data = await res.json();
+
+// ⛔ pastikan loader SELALU dihapus
+if (botMsg && botMsg.parentNode) botMsg.remove();
+
+/* =============================
+   HANDLE MULTI-REPLIES (LIMIT)
+============================= */
+if (Array.isArray(data.replies)) {
+  for (const r of data.replies) {
+    const msg = document.createElement("div");
+    msg.classList.add("msg", "bot");
+
+    const content = document.createElement("div");
+    content.classList.add("msg-content");
+
+    if (r.type === "buttons") {
+      content.innerHTML = r.content;
+    } else {
+      await typeMessage(content, r.content);
+    }
+
+    msg.appendChild(content);
+    chatBox.appendChild(msg);
+  }
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  if (data.remaining !== undefined) updateLimitUI(data.remaining);
+
+  // ✅ JANGAN LANJUT KE LOGIC reply
+  return;
+}
+
+/* =============================
+   NORMAL SINGLE REPLY
+============================= */
+const reply = data.reply || "";
+
+if (/```/.test(reply)) {
+  addMessage("bot", reply);
+} else {
+  const msg = document.createElement("div");
+  msg.classList.add("msg", "bot");
+
+  const content = document.createElement("div");
+  content.classList.add("msg-content");
+  msg.appendChild(content);
+  chatBox.appendChild(msg);
+
+  typeMessage(content, reply);
+}
+
+chatMemory[currentChatId].push({ role: "bot", content: reply });
+saveMemory();
+
+if (data.remaining !== undefined) updateLimitUI(data.remaining);
+
 
         // ===== HANDLE MULTI REPLY =====
 if (Array.isArray(data.replies)) {
