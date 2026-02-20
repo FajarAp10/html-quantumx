@@ -19,22 +19,14 @@ html, body {
   height: 100%;
 }
 
-
-html, body {
-  height: 100%;
-}
-
 body {
   background: #0d0d0d;
   color: #e6e6e6;
   display: flex;
-  height: 100%;              /* ⬅️ BUKAN 100dvh */
-  overflow: hidden;          /* ⬅️ PENTING */
+  height: 100%;
+  overflow: hidden;
   overscroll-behavior: none;
 }
-
-
-
 
 /* ===========================
    SIDEBAR
@@ -61,25 +53,30 @@ body {
   margin-left: 6px;
 }
 
+/* ===== TOMBOL OBROLAN BARU - BEDA SEDIKIT ===== */
 .new-chat {
-  background: #111;
+  background: #1a1a1a;
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
-  border: 1px solid #262626;
+  border: 1px solid #3b82f6;
   transition: .2s;
   font-size: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  color: #fff;
+  text-align: center;
 }
 
 .new-chat:hover {
-  background: #1a1a1a;
+  background: #252525;
+  border-color: #4a8fff;
 }
 
 .chat-list {
   flex: 1;
   overflow-y: auto;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .chat-item {
@@ -90,10 +87,41 @@ body {
   cursor: pointer;
   border: 1px solid #262626;
   transition: .2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .chat-item:hover {
   background: #1a1a1a;
+  border-color: #3b82f6;
+}
+
+.chat-item span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-item button {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  cursor: pointer;
+  font-size: 15px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.chat-item:hover button {
+  opacity: 1;
+}
+
+.chat-item button:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 /* ===========================
@@ -103,10 +131,9 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;              /* 🔥 WAJIB */
-  overflow: hidden;           /* 🔒 kunci di sini */
+  min-height: 0;
+  overflow: hidden;
 }
-
 
 #chat {
   flex: 1 1 auto;
@@ -119,7 +146,6 @@ body {
   min-height: 0;
   -webkit-overflow-scrolling: touch;
 }
-
 
 .empty-text {
   position: absolute;
@@ -175,7 +201,6 @@ body {
   border-radius: 18px 18px 4px 18px;
 }
 
-
 .bot .msg-content {
   background: #141414;
   border-radius: 14px 6px 6px 14px;
@@ -189,15 +214,15 @@ body {
 }
 
 /* ===========================
-   INPUT AREA & BUTTONS
+   INPUT AREA
 =========================== */
 .input-area {
-  padding: 12px 16px;
+  padding: 16px 20px;
   background: #0d0d0d;
   border-top: 1px solid #1a1a1a;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   position: sticky;
   bottom: 0;
   z-index: 10;
@@ -205,27 +230,35 @@ body {
 
 .input-area input {
   flex: 1;
-  padding: 12px 50px 12px 14px; /* beri space kanan untuk tombol kirim */
-  border-radius: 30px;
-  border: 1px solid #262626;
-  background: #111;
+  padding: 14px 50px 14px 20px;
+  border-radius: 40px;
+  border: 1px solid #333;
+  background: #1a1a1a;
   color: white;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
+  height: 52px;
+  transition: all 0.2s ease;
 }
 
 .input-area input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  background: #222;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.input-area input::placeholder {
+  color: #8a8a8a;
+  font-weight: 400;
 }
 
 .input-area button#sendBtn {
   position: absolute;
-  right: 22px;
+  right: 28px;
   top: 50%;
   transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   font-size: 16px;
   display: flex;
@@ -235,41 +268,41 @@ body {
   border: none;
   color: white;
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+  transition: all 0.2s ease;
 }
 
 .input-area button#sendBtn:hover {
   background: #4a8fff;
-  transform: translateY(-50%) scale(1.1); /* tetap posisinya */
+  transform: translateY(-50%) scale(1.05);
 }
 
 .input-area button#sendBtn:active {
-  transform: translateY(-50%) scale(0.95); /* kecil sedikit saat klik */
+  transform: translateY(-50%) scale(0.95);
 }
 
-
 .input-area button#uploadBtn {
-  width: 30px;
-  height: 30px;
-  font-size: 22px;
+  width: 42px;
+  height: 42px;
+  font-size: 26px;
   border-radius: 50%;
   border: none;
-  background: #3b82f6;
-  color: white;
+  background: #2a2a2a;
+  color: #e6e6e6;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: .2s;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .input-area button#uploadBtn:hover {
-  transform: scale(1.1);
-  background: #4a8fff;
+  background: #3a3a3a;
+  transform: scale(1.05);
 }
 
 /* ===========================
-   MOBILE TOPBAR
+   MOBILE TOPBAR - IKON HAMBURGER BAGUS
 =========================== */
 .mobile-topbar {
   display: none;
@@ -284,16 +317,34 @@ body {
   font-size: 20px;
   font-weight: 700;
   color: #e6e6e6;
+  flex: 1;
 }
 
+/* Ikon hamburger yang bagus */
 .mobile-menu-btn {
-  font-size: 24px;
-  background: #111;
+  background: #2a2a2a;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 8px 12px;
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: #3a3a3a;
+}
+
+.mobile-menu-btn span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* ===========================
@@ -305,14 +356,16 @@ body {
   top: 0;
   left: -300px;
   height: 100%;
+  width: 280px;
   z-index: 100;
   background: #161616;
   padding: 20px;
   border-right: 1px solid #262626;
   transition: left .3s;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
 }
 
-.sidebar.show {
+.sidebar.overlay.show {
   left: 0;
 }
 
@@ -331,36 +384,44 @@ body {
    IMAGE PREVIEW
 =========================== */
 #imagePreviewContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   position: relative;
-  margin: 8px 16px 0 16px;
-
-  max-height: 160px;
-  overflow-y: auto;
-
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-
-  min-height: 0;
+  display: inline-block;
+  margin: 8px 16px;
+  max-width: 180px;
 }
 
-
-/* IMAGE PREVIEW MINIMALIS */
-#imagePreviewContainer img {
+#imagePreview {
   display: block;
-  max-width: 180px;    /* lebih kecil dari sebelumnya */
-  max-height: 120px;   /* proporsional */
-  width: auto;         /* menjaga rasio */
-  height: auto;        /* menjaga rasio */
-  margin-bottom: 4px;  /* lebih rapih */
-  border-radius: 8px;  /* lebih minimalis */
+  width: 100%;
+  max-height: 120px;
+  border-radius: 8px;
   border: 1px solid #262626;
-  object-fit: cover;   /* memastikan crop rapih kalau ukuran berbeda */
+  object-fit: cover;
 }
 
+#removeImageBtn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e53935;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+#removeImageBtn:hover {
+  transform: scale(1.1);
+}
 
 /* ===========================
    POPUP HAPUS
@@ -432,7 +493,7 @@ body {
 }
 
 /* ===========================
-   BUTTONS (LOGIN / MODE)
+   BUTTONS
 =========================== */
 .login-btn {
   background: transparent;
@@ -445,33 +506,17 @@ body {
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
 
 .login-btn:hover {
-  transform: scale(1.1);
-}
-
-.mode-btn {
-  background: #8b0000;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.mode-btn:hover {
+  background: rgba(255,255,255,0.1);
   transform: scale(1.05);
 }
 
-.mode-btn.normal {
-  background: #2e7d32;
-  color: #fff;
-}
-
+/* ===== CODE BLOCK ===== */
 .code-block {
   background: #0f0f0f;
   border: 1px solid #333;
@@ -507,8 +552,6 @@ body {
   box-shadow: none !important;
 }
 
-
-/* ===== LOADING DOTS ===== */
 .loading-dots {
   display: flex;
   gap: 6px;
@@ -525,15 +568,9 @@ body {
   opacity: 0.2;
 }
 
-.loading-dots span:nth-child(1) {
-  animation-delay: 0s;
-}
-.loading-dots span:nth-child(2) {
-  animation-delay: .2s;
-}
-.loading-dots span:nth-child(3) {
-  animation-delay: .4s;
-}
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: .2s; }
+.loading-dots span:nth-child(3) { animation-delay: .4s; }
 
 @keyframes dotPulse {
   0%   { opacity: 0.2; transform: translateY(0); }
@@ -541,25 +578,6 @@ body {
   40%  { opacity: 0.2; transform: translateY(0); }
   100% { opacity: 0.2; transform: translateY(0); }
 }
-
-/* ANTI BULET HANTU */
-.msg-content:empty {
-  display: none;
-}
-
-/* ===== KHUSUS BUBBLE YANG ADA LOADING DOTS ===== */
-.msg.bot:has(.loading-dots) {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-/* pastikan loading tidak nambah tinggi dari dalam */
-.msg.bot:has(.loading-dots) .msg-content {
-  padding: 0 !important;
-}
-
 
 .code-block-wrapper {
   position: relative;
@@ -584,26 +602,6 @@ body {
   opacity: 1;
 }
 
-.limit-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.limit-buttons button {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: none;
-  background: #3b82f6;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.limit-buttons button:hover {
-  background: #4a8fff;
-}
-
-
 /* ===========================
    RESPONSIVE
 =========================== */
@@ -613,8 +611,8 @@ body {
     height: 100%;
   }
 
-   #imagePreviewContainer {
-    max-height: 140px;
+  #imagePreviewContainer {
+    max-width: 150px;
   }
 
   .sidebar {
@@ -632,15 +630,41 @@ body {
   .chat-wrapper { min-height: 0; }
   #chat { min-height: 0; }
 
-   #imagePreviewContainer img {
-    max-width: 60%;    /* menyesuaikan lebar layar HP */
+  #imagePreviewContainer img {
+    max-width: 100%;
     max-height: 100px;
   }
 
   .msg { max-width: 95% !important; }
+  
+  .input-area {
+    padding: 12px 16px;
+  }
+  
+  .input-area input {
+    padding: 12px 45px 12px 16px;
+    height: 48px;
+    font-size: 15px;
+  }
+  
+  .input-area button#sendBtn {
+    right: 22px;
+    width: 34px;
+    height: 34px;
+  }
+  
+  .input-area button#uploadBtn {
+    width: 38px;
+    height: 38px;
+    font-size: 24px;
+  }
+
+  .mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
 }
-
-
 </style>
 </head>
 <body>
@@ -659,26 +683,29 @@ body {
   <div class="chat-list"></div>
 </div>
 
-
 <!-- Chat Wrapper -->
 <div class="chat-wrapper">
   <div class="mobile-topbar">
-  <button id="mobileMenuBtn" class="mobile-menu-btn">⋮</button>
-  <span class="mobile-title" style="flex:1;">QuantumX</span>
-  <div style="display:flex; align-items:center; gap:6px;">
-    <button id="loginBtnMobile" class="login-btn">⚙</button>
+    <button id="mobileMenuBtn" class="mobile-menu-btn">
+      <span>☰</span>
+    </button>
+    <span class="mobile-title">QuantumX</span>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <button id="loginBtnMobile" class="login-btn">⚙</button>
+    </div>
   </div>
-</div>
 
   <div id="chat">
     <div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>
   </div>
 
-   <div id="imagePreviewContainer" style="display:none; margin:8px 16px 0 16px;">
-    <img id="imagePreview" src="" style="max-width:80%; border-radius:12px; border:1px solid #262626;" />
-    <button id="removeImageBtn" style="margin-top:6px; padding:6px 10px; border:none; border-radius:8px; cursor:pointer; background:#e53935; color:white;">Hapus</button>
+  <!-- IMAGE PREVIEW -->
+  <div id="imagePreviewContainer" style="display:none;">
+    <img id="imagePreview" src="" alt="Preview">
+    <button id="removeImageBtn">✕</button>
   </div>
 
+  <!-- INPUT AREA -->
   <div class="input-area">
     <button id="uploadBtn">+</button>
     <input id="msg" placeholder="Ketik pesan..." />
@@ -687,8 +714,7 @@ body {
         <path d="M12 19V5M5 12l7-7 7 7"/>
       </svg>
     </button>
-</div>
-
+  </div>
 </div>
 
 <!-- Sidebar Overlay (Mobile) -->
@@ -712,15 +738,12 @@ body {
   <div class="popup-box">
     <h3>Hapus Obrolan?</h3>
     <p>Obrolan ini akan hilang.</p>
-
     <div class="popup-btns">
       <button class="popup-btn popup-cancel" onclick="closePopup()">Batal</button>
       <button class="popup-btn popup-delete" id="confirmDeleteBtn">Hapus</button>
     </div>
   </div>
 </div>
-
-
 
 <script>
 const backendUrl = "https://quantumx.zeabur.app";
@@ -731,33 +754,30 @@ const chatLists = document.querySelectorAll(".chat-list");
 const limitCounter = document.getElementById("limitCounter");
 const limitCounterOverlay = document.getElementById("limitCounterOverlay");
 
-
-
 // ===== STORAGE =====
 let chatMemory = JSON.parse(localStorage.getItem("chatMemory")||"{}");
 let chatNames = JSON.parse(localStorage.getItem("chatNames")||"{}");
 
 let senderId = localStorage.getItem("senderId");
 
-
-
-// Hanya buat baru kalau belum ad
 if (!senderId) {
-  const randomNum = Math.floor(100 + Math.random() * 900); // 100–999
+  const randomNum = Math.floor(100 + Math.random() * 900);
   senderId = "User-" + randomNum;
   localStorage.setItem("senderId", senderId);
 }
 
-
-
-
-// Tampilkan username di semua sidebar
 document.getElementById("userNameDisplayDesktop").textContent = senderId;
 document.getElementById("userNameDisplayMobileOverlay").textContent = senderId;
 
-
-// current chat yang aktif (bisa pindah-pindah)
 let currentChatId = null;
+
+// ===== FUNGSI UNTUK TUTUP SIDEBAR MOBILE =====
+function closeMobileSidebar() {
+  const overlaySidebar = document.querySelector(".sidebar.overlay");
+  const backdrop = document.querySelector(".sidebar-backdrop");
+  overlaySidebar.classList.remove("show");
+  backdrop.style.display = "none";
+}
 
 // ===== INIT =====
 function initChatMemory(chatId){
@@ -769,8 +789,6 @@ function updateLimitUI(limit){
   if(limitCounter) limitCounter.textContent=`(${limit})`;
   if(limitCounterOverlay) limitCounterOverlay.textContent=`(${limit})`;
 }
-
-
 
 async function addMessage(type, text) {
     const empty = chatBox.querySelector(".empty-text");
@@ -785,44 +803,40 @@ async function addMessage(type, text) {
         const chunk = parts[i].trim();
 
         if (i % 2 === 0) {
-            // TEKS
             if (chunk !== "") {
                 const div = document.createElement("div");
                 div.classList.add("msg-content");
                 msg.appendChild(div);
-
                 await typeMessage(div, chunk);
             }
-
         } else {
-            // CODE BLOCK
-const wrapper = document.createElement("div");
-wrapper.classList.add("code-block-wrapper");
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("code-block-wrapper");
 
-const copyBtn = document.createElement("button");
-copyBtn.classList.add("copy-btn");
-copyBtn.textContent = "Salin";
+            const copyBtn = document.createElement("button");
+            copyBtn.classList.add("copy-btn");
+            copyBtn.textContent = "Salin";
 
-const codeDiv = document.createElement("div");
-codeDiv.classList.add("code-block");
-codeDiv.textContent = chunk;
+            const codeDiv = document.createElement("div");
+            codeDiv.classList.add("code-block");
+            codeDiv.textContent = chunk;
 
-copyBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(chunk);
-    copyBtn.textContent = "Tersalin!";
-    setTimeout(() => copyBtn.textContent = "Salin", 1200);
-});
+            copyBtn.addEventListener("click", () => {
+                navigator.clipboard.writeText(chunk);
+                copyBtn.textContent = "Tersalin!";
+                setTimeout(() => copyBtn.textContent = "Salin", 1200);
+            });
 
-wrapper.appendChild(copyBtn);
-wrapper.appendChild(codeDiv);
-msg.appendChild(wrapper);
-
+            wrapper.appendChild(copyBtn);
+            wrapper.appendChild(codeDiv);
+            msg.appendChild(wrapper);
         }
     }
 
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 function renderHistoryMessage(role, content, image = null) {
     const msg = document.createElement("div");
     msg.classList.add("msg", role);
@@ -850,7 +864,6 @@ function renderHistoryMessage(role, content, image = null) {
                     const div = document.createElement("div");
                     div.classList.add("msg-content");
 
-                    // 🔥 FIX BUTTON / HTML
                     if (chunk.startsWith("<div")) {
                         div.innerHTML = chunk;
                     } else {
@@ -887,24 +900,28 @@ function renderHistoryMessage(role, content, image = null) {
     chatBox.appendChild(msg);
 }
 
-async function typeMessage(msgContent,text){
-  const THRESHOLD=40;
-  msgContent.textContent="";
-  const animLength=Math.min(text.length,THRESHOLD);
-  for(let i=0;i<animLength;i++){
-    msgContent.textContent+=text[i];
-    chatBox.scrollTop=chatBox.scrollHeight;
-    await new Promise(r=>setTimeout(r,10+Math.random()*2));
+async function typeMessage(msgContent, text) {
+  const THRESHOLD = 40;
+  msgContent.textContent = "";
+  const animLength = Math.min(text.length, THRESHOLD);
+  for (let i = 0; i < animLength; i++) {
+    msgContent.textContent += text[i];
+    chatBox.scrollTop = chatBox.scrollHeight;
+    await new Promise(r => setTimeout(r, 10 + Math.random() * 2));
   }
-  if(text.length>THRESHOLD){msgContent.textContent+=text.slice(THRESHOLD);chatBox.scrollTop=chatBox.scrollHeight;}
+  if (text.length > THRESHOLD) {
+    msgContent.textContent += text.slice(THRESHOLD);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 }
+
 // ===== IMAGE UPLOAD =====
 const uploadBtn = document.getElementById("uploadBtn");
 const imagePreviewContainer = document.getElementById("imagePreviewContainer");
 const imagePreview = document.getElementById("imagePreview");
 const removeImageBtn = document.getElementById("removeImageBtn");
 
-let selectedImage = null; // menyimpan base64
+let selectedImage = null;
 
 uploadBtn.addEventListener("click", () => {
     const inputFile = document.createElement("input");
@@ -918,9 +935,9 @@ uploadBtn.addEventListener("click", () => {
 
         const reader = new FileReader();
         reader.onload = () => {
-            selectedImage = reader.result; // base64
+            selectedImage = reader.result;
             imagePreview.src = selectedImage;
-            imagePreviewContainer.style.display = "block";
+            imagePreviewContainer.style.display = "inline-block";
         };
         reader.readAsDataURL(file);
     };
@@ -932,11 +949,9 @@ removeImageBtn.addEventListener("click", () => {
     imagePreview.src = "";
 });
 
-
-// helper: append user image message (synchronous)
-function appendUserImage(imageBase64){
+function appendUserImage(imageBase64) {
     const msg = document.createElement("div");
-    msg.classList.add("msg","user");
+    msg.classList.add("msg", "user");
 
     const content = document.createElement("div");
     content.classList.add("msg-content");
@@ -953,7 +968,6 @@ function appendUserImage(imageBase64){
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-
 async function renderBotMessageWithCode(msg, text) {
     const parts = text.split(/```/);
 
@@ -962,13 +976,11 @@ async function renderBotMessageWithCode(msg, text) {
         if (!chunk) continue;
 
         if (i % 2 === 0) {
-            // TEXT
             const div = document.createElement("div");
             div.classList.add("msg-content");
             msg.appendChild(div);
             await typeMessage(div, chunk);
         } else {
-            // CODE
             const wrapper = document.createElement("div");
             wrapper.classList.add("code-block-wrapper");
 
@@ -993,7 +1005,6 @@ async function renderBotMessageWithCode(msg, text) {
     }
 }
 
-
 function hideEmptyText() {
     const empty = document.querySelector(".empty-text");
     if (empty) empty.remove();
@@ -1015,15 +1026,12 @@ async function sendMsg() {
         const newId = "chat-" + Date.now();
         currentChatId = newId;
         initChatMemory(currentChatId);
-
-          localStorage.setItem("activeChatId", currentChatId);
-
+        localStorage.setItem("activeChatId", currentChatId);
         isNewChat = true;
     } else {
         initChatMemory(currentChatId);
     }
 
-    // ===== USER MESSAGE =====
     if (imageToSend) {
         appendUserImage(imageToSend);
         chatMemory[currentChatId].push({
@@ -1051,7 +1059,6 @@ async function sendMsg() {
 
     saveMemory();
 
-    // ===== BOT LOADING (SATU BUBBLE) =====
     const botMsg = document.createElement("div");
     botMsg.classList.add("msg", "bot");
 
@@ -1086,9 +1093,8 @@ async function sendMsg() {
 
         const data = await res.json();
 
-        // ===== MULTI REPLY =====
         if (Array.isArray(data.replies)) {
-            botMsg.remove(); // loading khusus single reply
+            botMsg.remove();
 
             for (const r of data.replies) {
                 if (!r.content || !r.content.trim()) continue;
@@ -1115,30 +1121,23 @@ async function sendMsg() {
             if (data.remaining !== undefined) updateLimitUI(data.remaining);
             return;
         }
-// ===== SINGLE REPLY =====
-const reply = data.reply || "";
 
-if (!reply.trim()) {
-    botMsg.remove();
-    return;
-}
+        const reply = data.reply || "";
 
-// GANTI LOADING → ISI PESAN
-botContent.innerHTML = "";
+        if (!reply.trim()) {
+            botMsg.remove();
+            return;
+        }
 
-// 1️⃣ HTML (BUTTON, LIMIT, DLL)
-if (reply.trim().startsWith("<")) {
-    botContent.innerHTML = reply;
-}
-// 2️⃣ ADA CODE BLOCK ```
-else if (reply.includes("```")) {
-    await renderBotMessageWithCode(botContent, reply);
-}
-// 3️⃣ TEKS BIASA
-else {
-    await typeMessage(botContent, reply);
-}
+        botContent.innerHTML = "";
 
+        if (reply.trim().startsWith("<")) {
+            botContent.innerHTML = reply;
+        } else if (reply.includes("```")) {
+            await renderBotMessageWithCode(botContent, reply);
+        } else {
+            await typeMessage(botContent, reply);
+        }
 
         chatMemory[currentChatId].push({ role: "bot", content: reply });
         saveMemory();
@@ -1153,11 +1152,8 @@ else {
     }
 }
 
-
-function loadChat(chatId){
+function loadChat(chatId) {
     currentChatId = chatId;
-
-    // simpan chat aktif
     localStorage.setItem("activeChatId", chatId);
 
     chatBox.innerHTML = "";
@@ -1180,6 +1176,9 @@ function loadChat(chatId){
 
     chatBox.scrollTop = chatBox.scrollHeight;
     fetchLimit();
+    
+    // Tutup sidebar mobile setelah memilih obrolan
+    closeMobileSidebar();
 }
 
 function renderChatList() {
@@ -1196,32 +1195,14 @@ function renderChatList() {
     ids.forEach(chatId => {
       const item = document.createElement("div");
       item.classList.add("chat-item");
-      item.style.display = "flex";
-      item.style.alignItems = "center";
-      item.style.justifyContent = "space-between";
-      item.style.padding = "10px 12px";
-      item.style.borderRadius = "8px";
-      item.style.cursor = "pointer";
 
-      // Nama Chat
       const nameSpan = document.createElement("span");
       nameSpan.textContent = chatNames[chatId] || "Obrolan Baru";
-      nameSpan.style.flex = "1";
 
-      // Tombol Hapus
       const delBtn = document.createElement("button");
       delBtn.innerHTML = "🗑";
-      delBtn.style.marginLeft = "8px";
-      delBtn.style.background = "transparent";
-      delBtn.style.border = "none";
-      delBtn.style.color = "#ff4d4d";
-      delBtn.style.cursor = "pointer";
-      delBtn.style.fontSize = "15px";
 
-      // Klik load chat
       nameSpan.addEventListener("click", () => loadChat(chatId));
-
-      // Popup hapus
       delBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         showPopup(chatId);
@@ -1233,8 +1214,6 @@ function renderChatList() {
     });
   });
 }
-
-
 
 let deleteTargetChat = null;
 
@@ -1257,26 +1236,27 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
   if (currentChatId === deleteTargetChat) {
     currentChatId = null;
     localStorage.removeItem("activeChatId");
-}
+  }
 
   saveMemory();
   renderChatList();
-
   chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
-
   closePopup();
 };
 
-
-
 // ===== MOBILE SIDEBAR =====
-const mobileMenuBtn=document.getElementById("mobileMenuBtn");
-const overlaySidebar=document.querySelector(".sidebar.overlay");
-const backdrop=document.querySelector(".sidebar-backdrop");
-mobileMenuBtn.addEventListener("click",()=>{overlaySidebar.classList.add("show");backdrop.style.display="block";});
-backdrop.addEventListener("click",()=>{overlaySidebar.classList.remove("show");backdrop.style.display="none";});
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const overlaySidebar = document.querySelector(".sidebar.overlay");
+const backdrop = document.querySelector(".sidebar-backdrop");
 
+mobileMenuBtn.addEventListener("click", () => {
+  overlaySidebar.classList.add("show");
+  backdrop.style.display = "block";
+});
 
+backdrop.addEventListener("click", () => {
+  closeMobileSidebar();
+});
 
 // ===== GENERATE TITLE =====
 async function generateTitle(topic) {
@@ -1295,11 +1275,8 @@ async function generateTitle(topic) {
     }
 }
 
-
-
 document.querySelectorAll(".new-chat").forEach(btn => {
   btn.addEventListener("click", async () => {
-
     try {
       await fetch(`${backendUrl}/api/ai`, {
         method: "POST",
@@ -1313,16 +1290,14 @@ document.querySelectorAll(".new-chat").forEach(btn => {
       });
     } catch {}
 
-    // 🟢 RESET LOCAL CHAT
     currentChatId = null;
     localStorage.removeItem("activeChatId");
-
-
-    // 🟢 TAMPILKAN HOME
     chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
+    
+    // Tutup sidebar mobile
+    closeMobileSidebar();
   });
 });
-
 
 document.getElementById("loginBtnDesktop").onclick = () => {
   window.location.href = "settings.html";
@@ -1332,24 +1307,22 @@ document.getElementById("loginBtnMobile").onclick = () => {
   window.location.href = "settings.html";
 };
 
-
-
-// ===== FETCH LIMIT =====
-async function fetchLimit(){
-  try{
+async function fetchLimit() {
+  try {
     const res = await fetch(`${backendUrl}/api/ai`, {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({sender:senderId,message:""})
-});
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sender: senderId, message: "" })
+    });
 
     const data = await res.json();
-    if(data.remaining!==undefined) updateLimitUI(data.remaining);
-  }catch(e){console.log("❌ Gagal fetch limit:", e);}
+    if (data.remaining !== undefined) updateLimitUI(data.remaining);
+  } catch (e) {
+    console.log("❌ Gagal fetch limit:", e);
+  }
 }
 
-// ===== SAVE MEMORY =====
-function saveMemory(){
+function saveMemory() {
   localStorage.setItem("chatMemory", JSON.stringify(chatMemory));
   localStorage.setItem("chatNames", JSON.stringify(chatNames));
   localStorage.setItem("senderId", senderId);
@@ -1370,11 +1343,16 @@ if (activeChatId && chatMemory[activeChatId]) {
     chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
 }
 
-sendBtn.addEventListener("click",sendMsg);
-input.addEventListener("keydown",(e)=>{if(e.key==="Enter") sendMsg();});
+sendBtn.addEventListener("click", sendMsg);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendMsg();
+  }
+});
+
 fetchLimit();
 
-// ===== CEK APAKAH MODE BARU PERLU RESET =====
 async function checkModeReset() {
     const shouldReset = localStorage.getItem("aiShouldReset");
     if (shouldReset === "yes") {
@@ -1389,29 +1367,20 @@ async function checkModeReset() {
                     mode: localStorage.getItem("aiMode") || "normal"
                 })
             });
-        } catch(e){
+        } catch (e) {
             console.log("❌ Gagal reset AI mode:", e);
         }
 
         currentChatId = null;
-localStorage.removeItem("activeChatId");
-
-chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
-renderChatList();
-
-
+        localStorage.removeItem("activeChatId");
+        chatBox.innerHTML = `<div class="empty-text">QuantumX di sini, ada yang bisa dibantu?</div>`;
+        renderChatList();
         localStorage.removeItem("aiShouldReset");
     }
 }
 
-// cek saat halaman dimuat
 window.addEventListener("DOMContentLoaded", checkModeReset);
-
-// cek saat user balik ke tab
 window.addEventListener("focus", checkModeReset);
-
-
 </script>
-
 </body>
 </html>
