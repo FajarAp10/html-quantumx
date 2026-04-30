@@ -1,276 +1,535 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Settings – QuantumX</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings – QuantumX</title>
 
-<style>
-    body {
-        margin: 0;
-        font-family: "Poppins", sans-serif;
-        background: #0a0a0d;
-        color: white;
-    }
+    <!-- Google Fonts: Sora -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    
+    <style>
+        /* CSS VARIABLES */
+        :root {
+            --bg-main: #0e0f11;
+            --bg-surface: #141518;
+            --bg-surface-hover: #1a1c20;
+            --border-color: #242629;
+            --border-highlight: rgba(79, 142, 247, 0.4);
+            --accent: #4f8ef7;
+            --accent-hover: #6a9ff8;
+            --accent-glow: rgba(79, 142, 247, 0.15);
+            --text-main: #ffffff;
+            --text-muted: #8e9096;
+            --text-xs: #6b6d73;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    *,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+        /* GLOBAL RESET */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: "Sora", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    /* HEADER */
-    .top-bar {
-        width: 100%;
-        padding: 16px 22px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: rgba(255,255,255,0.04);
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        backdrop-filter: blur(10px);
-        position: sticky;
-        top: 0;
-        z-index: 50;
-    }
+        /* HEADER / TOP BAR */
+        .top-bar {
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(14, 15, 17, 0.6);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
 
-    .top-title {
-        font-size: 20px;
-        font-weight: 500;
-        color: #ffffff;
-    }
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-    .admin-btn {
-        background: linear-gradient(135deg,#003d6b,#0078c2);
-        border: none;
-        padding: 8px 18px;
-        font-size: 14px;
-        border-radius: 10px;
-        color: white;
-        cursor: pointer;
-        transition: 0.25s;
-        font-weight: 500;
-        box-shadow: 0 0 12px rgba(0,120,200,0.3);
-    }
-    .admin-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 14px rgba(0,160,255,0.5);
-    }
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+        }
 
-    .settings-container {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+        .back-btn:hover {
+            background: var(--bg-surface-hover);
+            border-color: var(--text-muted);
+            transform: scale(1.05);
+        }
 
-    .settings-card {
-        background: rgba(255,255,255,0.03);
-        padding: 25px;
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,0.07);
-        box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    }
+        .top-title {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
 
-    .settings-title {
-        font-size: 24px;
-        font-weight: 500;
-        margin-bottom: 20px;
-        color: #ffffff;
-    }
+        .admin-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-weight: 500;
+        }
 
-    .setting-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        font-size: 16px;
-    }
+        .admin-btn:hover {
+            background: var(--bg-surface-hover);
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
 
-    .change-ai-btn {
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg,#003d6b,#0078c2);
-        border: none;
-        color: white;
-        border-radius: 14px;
-        font-size: 15px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-weight: 500;
-        box-shadow: 0 0 12px rgba(0,120,200,0.35);
-    }
-    .change-ai-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 0 18px rgba(0,160,255,0.5);
-    }
+        .admin-btn:active {
+            transform: scale(0.96);
+        }
 
-    /* POPUP */
-    .popup-bg {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(4px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 100;
-    }
+        /* LAYOUT & CARDS */
+        .settings-container {
+            width: 100%;
+            max-width: 640px;
+            margin: 32px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
 
-    .popup-box {
-        width: 90%;
-        max-width: 350px;
-        background: #12141c;
-        padding: 25px;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
-        box-shadow: 0 0 25px rgba(0,0,0,0.55);
-        animation: popupZoom 0.25s ease;
-    }
+        .settings-card {
+            background: var(--bg-surface);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
 
-    @keyframes popupZoom {
-        from {opacity: 0; transform: scale(0.75);}
-        to {opacity: 1; transform: scale(1);}
-    }
+        .settings-card:hover {
+            border-color: var(--border-highlight);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px var(--accent-glow);
+        }
 
-    .popup-title {
-        text-align: center;
-        font-size: 20px;
-        margin-bottom: 15px;
-        font-weight: 500;
-    }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .ai-option {
-        padding: 14px;
-        border-radius: 14px;
-        margin: 10px 0;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: 0.2s;
-        font-size: 15px;
-    }
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-    .ai-option:hover {
-        background: rgba(255,255,255,0.07);
-    }
+        .icon-badge {
+            background: rgba(255,255,255,0.05);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+        }
 
-    .ai-selected {
-        border: 1px solid #0098ff;
-        background: rgba(0,150,255,0.12);
-    }
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 16px 0;
+            width: 100%;
+        }
 
-    
+        /* CURRENT AI STATUS */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--bg-main);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
 
-    .popup-ok {
-        width: 100%;
-        padding: 12px;
-        margin-top: 10px;
-        background: linear-gradient(135deg,#003d6b,#0078c2);
-        border: none;
-        color: white;
-        border-radius: 14px;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: 0.2s;
-    }
-    .popup-ok:hover {
-        box-shadow: 0 0 18px rgba(0,160,255,0.4);
-    }
+        .setting-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
 
-    /* SMALL POPUP */
-    .small-popup {
-        position: fixed;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(30,30,40,0.95);
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-size: 14px;
-        opacity: 0;
-        transition: 0.3s;
-        z-index: 200;
-    }
-    .small-popup.show {
-        opacity: 1;
-        bottom: 45px;
-    }
-</style>
+        .setting-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 8px;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .model-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+
+        /* BUTTONS */
+        .change-ai-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            border: none;
+            color: var(--bg-main);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .change-ai-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 142, 247, 0.25);
+        }
+
+        .change-ai-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* DESCRIPTIONS */
+        .ai-description {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .desc-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .desc-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .desc-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* POPUP MODAL (SAAS STYLE) */
+        .popup-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(14, 15, 17, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .popup-box {
+            width: 90%;
+            max-width: 380px;
+            background: var(--bg-surface);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+            transform: scale(0.95);
+            animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes scaleUp { to { transform: scale(1); } }
+
+        .popup-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .popup-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .popup-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .ai-option {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ai-option-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ai-option-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .ai-option:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-surface-hover);
+        }
+
+        .ai-selected {
+            border-color: var(--accent);
+            background: rgba(79, 142, 247, 0.08);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        
+        .ai-selected .ai-option-title {
+            color: var(--accent);
+        }
+
+        .popup-ok {
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            background: var(--text-main);
+            color: var(--bg-main);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .popup-ok:hover {
+            background: #e2e2e5;
+            transform: translateY(-1px);
+        }
+
+        .popup-ok:active {
+            transform: scale(0.98);
+        }
+
+        /* TOAST NOTIFICATION */
+        .small-popup {
+            position: fixed;
+            bottom: -60px;
+            right: 24px;
+            background: var(--bg-surface-hover);
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            border: 1px solid rgba(79, 142, 247, 0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .small-popup::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .small-popup.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .settings-container { padding: 0 16px; margin: 24px auto; }
+            .small-popup { right: 16px; left: 16px; text-align: center; justify-content: center; }
+        }
+    </style>
 </head>
 
 <body>
 
 <!-- HEADER -->
 <div class="top-bar">
-    <div class="top-title">⚙ Settings</div>
+    <div class="top-left">
+        <button class="back-btn" onclick="window.history.back()">←</button>
+        <div class="top-title">Settings</div>
+    </div>
     <button class="admin-btn" onclick="goAdmin()">Admin</button>
 </div>
 
 <!-- CONTENT -->
 <div class="settings-container">
+    
     <!-- Card 1: Pengaturan AI -->
     <div class="settings-card">
-        <div class="settings-title">Pengaturan AI</div>
-        <div class="setting-row">
-            <span>Mode AI Saat Ini:</span>
-            <strong id="currentModel">Dark</strong>
+        <div class="card-header">
+            <div class="icon-badge">⚙️</div>
+            <div class="settings-title">Konfigurasi Model</div>
         </div>
-        <button class="change-ai-btn" onclick="openPopup()">Ganti Mode AI</button>
+        
+        <div class="setting-row">
+            <div class="setting-info">
+                <span class="setting-label">Model Aktif Saat Ini</span>
+                <div class="status-badge">
+                    <span class="status-dot"></span> Aktif sekarang
+                </div>
+            </div>
+            <strong id="currentModel" class="model-value">Normal</strong>
+        </div>
+        
+        <button class="change-ai-btn" onclick="openPopup()">Ubah Model AI</button>
     </div>
 
     <!-- Card 2: Pengenalan AI -->
     <div class="settings-card">
-        <div class="settings-title">Pengenalan AI</div>
+        <div class="card-header">
+            <div class="icon-badge">🤖</div>
+            <div class="settings-title">Direktori Model</div>
+        </div>
+        
         <div class="ai-description">
-            <p><strong>Normal Mode:</strong> Mode ini merupakan mode standar, lebih ramah dan aman untuk semua percakapan.</p>
-             <p><strong>Dark Mode:</strong> Mode ini merupakan ilegal, kasar, kejam tidak disarankan untuk kalangan umum.</p>
+            <div class="desc-item">
+                <span class="desc-title">Normal Mode</span>
+                <span class="desc-text">Standar operasional. Respons difilter, ramah, dan dioptimalkan untuk percakapan umum yang aman.</span>
+            </div>
+            <div class="divider"></div>
+            <div class="desc-item">
+                <span class="desc-title" style="color: #ff5b5b;">Dark Mode</span>
+                <span class="desc-text">Mode tanpa filter. Respons eksplisit, tidak dibatasi aturan standar. Dirancang khusus untuk skenario eksperimental atau pengujian sistem.</span>
+            </div>
         </div>
     </div>
 
-    <!-- Card 3: Contoh Card Baru -->
+    <!-- Card 3: Tips -->
     <div class="settings-card">
-        <div class="settings-title">Tips Menggunakan AI</div>
+        <div class="card-header">
+            <div class="icon-badge">💡</div>
+            <div class="settings-title">Panduan Penggunaan</div>
+        </div>
+        
         <div class="ai-description">
-            <p>Gunakan Normal Mode untuk percakapan aman, ramah, dan cocok untuk semua usia.</p>
-             <p>Gunakan Dark Mode untuk kejahatan kriminalisme atau hacking.</p>
-            <p>Periksa model AI sebelum memulai percakapan agar hasil sesuai keinginan.</p>
+            <div class="desc-item">
+                <span class="desc-text">• Gunakan <strong>Normal Mode</strong> untuk produktivitas harian dan bantuan umum.</span>
+            </div>
+            <div class="desc-item">
+                <span class="desc-text">• Gunakan <strong>Dark Mode</strong> hanya untuk simulasi keamanan, penulisan tanpa batas, atau analisis tingkat lanjut.</span>
+            </div>
+            <div class="desc-item">
+                <span class="desc-text">• Pastikan memeriksa indikator model aktif di bagian atas sebelum memulai prompt baru.</span>
+            </div>
         </div>
     </div>
+
 </div>
 
-
-
-<!-- POPUP -->
+<!-- POPUP MODAL -->
 <div class="popup-bg" id="popupAI">
     <div class="popup-box">
-        <div class="popup-title">Pilih Model AI</div>
+        <div class="popup-header">
+            <div class="popup-title">Pilih Model AI</div>
+            <div class="popup-subtitle">Tentukan engine untuk sesi chat Anda.</div>
+        </div>
 
         <div class="ai-option" id="optNormal" onclick="selectAI('normal')">
-            Normal
+            <span class="ai-option-title">Normal Mode</span>
+            <span class="ai-option-desc">Aman & terfilter untuk umum.</span>
         </div>
 
-          <div class="ai-option" id="optDark" onclick="selectAI('dark')">
-            Dark 
+        <div class="ai-option" id="optDark" onclick="selectAI('dark')">
+            <span class="ai-option-title">Dark Mode</span>
+            <span class="ai-option-desc">Tanpa filter, eksperimental & uncensored.</span>
         </div>
 
-        <button class="popup-ok" onclick="confirmAI()">Oke</button>
+        <button class="popup-ok" onclick="confirmAI()">Terapkan Perubahan</button>
     </div>
 </div>
 
+<!-- TOAST NOTIFICATION -->
 <div class="small-popup" id="notifPopup">
-    Model AI berhasil diubah!
+    Konfigurasi AI berhasil diperbarui
 </div>
 
-
-
+<!-- JAVASCRIPT (TETAP SAMA) -->
 <script>
 let selectedModel = "normal"; 
 let aiMode = localStorage.getItem("aiMode") || "normal";
