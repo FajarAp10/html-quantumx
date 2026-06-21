@@ -1194,11 +1194,48 @@ async function sendMsg() {
     initChatMemory(currentChatId);
   }
 
-  // ── DETEKSI PERMINTAAN GAMBAR ──
-  const isImageRequest = text.toLowerCase().includes("buat gambar") || 
-                         text.toLowerCase().includes("generate gambar") ||
-                         text.toLowerCase().includes("bikin gambar") ||
-                         text.toLowerCase().startsWith("/image");
+ // ── DETEKSI PERMINTAAN GAMBAR ── (VERSI SUPER LENGKAP)
+const imageKeywords = [
+  // Prefix command
+  "/image", "/img", "/gambar", "/generate", "/gen", "/create", "/draw",
+  
+  // Bahasa Indonesia - variasi "buat"
+  "buat gambar", "buatkan gambar", "bikin gambar", "bikinin gambar", 
+  "buat gambar", "buatin gambar", "bikinin gambar", "bikin gambar",
+  "tolong buatkan gambar", "tolong bikin gambar", "minta gambar",
+  
+  // Bahasa Indonesia - kata kerja lain
+  "gambarkan", "gambarin", "lukis", "lukisin", "lukiskan",
+  "hasil gambar", "ciptakan gambar", "kreasi gambar",
+  "generate gambar", "generated gambar", "generating gambar",
+  
+  // Bahasa Indonesia - kata benda
+  "gambar kucing", "gambar anime", "gambar pemandangan", "gambar kartun",
+  "gambar abstrak", "gambar realistik", "gambar 3d", "gambar ilustrasi",
+  "gambar robot", "gambar bunga", "gambar mobil", "gambar rumah",
+  "gambar gedung", "gambar laut", "gambar gunung", "gambar pantai",
+  "gambar hutan", "gambar hewan", "gambar manusia", "gambar makanan",
+  "gambar minuman", "gambar pemandangan", "gambar alam", "gambar fantasi",
+  "gambar anime", "gambar kartun", "gambar manga", "gambar sketsa",
+  "gambar doodle", "gambar minimalis", "gambar vintage", "gambar modern",
+  
+  // Bahasa Indonesia - kalimat perintah
+  "buatin dong gambar", "bikinin dong gambar", "gambar dong",
+  "minta gambar", "mau gambar", "ingin gambar", "butuh gambar",
+  
+  // Bahasa Inggris
+  "create image", "generate image", "make image", "draw image",
+  "create picture", "generate picture", "make picture", "draw picture",
+  "image of", "picture of", "photo of", "illustration of",
+  
+  // Campuran
+  "make a image", "make an image", "create an image", "generate an image",
+  "buatkan image", "bikinin image", "gambar image",
+];
+
+const isImageRequest = imageKeywords.some(keyword => 
+  text.toLowerCase().includes(keyword)
+);
   
   if (isImageRequest && text && !imageToSend) {
     // Tampilkan pesan user dulu
