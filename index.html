@@ -48,13 +48,11 @@ html, body {
 
 body { display: flex; }
 
-/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ─── SIDEBAR ─── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--bg-surface);
@@ -206,7 +204,6 @@ body { display: flex; }
 .chat-item:hover .del-btn { opacity: 1; }
 .chat-item .del-btn:hover { color: #e05252; background: rgba(224,82,82,0.1); }
 
-/* ─── MAIN CHAT WRAPPER ─── */
 .chat-wrapper {
   flex: 1;
   display: flex;
@@ -215,7 +212,6 @@ body { display: flex; }
   overflow: hidden;
 }
 
-/* ─── MOBILE TOPBAR ─── */
 .mobile-topbar {
   display: none;
   align-items: center;
@@ -239,7 +235,6 @@ body { display: flex; }
 }
 .hamburger-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-/* ─── CHAT AREA ─── */
 #chat {
   flex: 1;
   overflow-y: auto;
@@ -283,7 +278,6 @@ body { display: flex; }
 .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
 .empty-state p { font-size: 14px; color: var(--text-muted); }
 
-/* ─── MESSAGES ─── */
 .msg {
   display: flex;
   flex-direction: column;
@@ -310,7 +304,6 @@ body { display: flex; }
   max-width: 100%;
 }
 
-/* User bubble */
 .msg.user .msg-content {
   background: var(--user-bg);
   border: 1px solid var(--user-border);
@@ -324,7 +317,6 @@ body { display: flex; }
   border-color: rgba(79,142,247,0.35);
 }
 
-/* Bot bubble */
 .msg.bot {
   background: var(--bot-bg);
   border: 1px solid var(--border);
@@ -345,7 +337,6 @@ body { display: flex; }
   border-radius: 0 !important;
 }
 
-/* ─── CODE BLOCKS ─── */
 .code-block-wrapper { position: relative; }
 .code-block {
   background: #0a0b0d;
@@ -376,7 +367,6 @@ body { display: flex; }
 }
 .copy-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-/* ─── SMART LOADING ─── */
 .smart-loading-wrap {
   display: flex;
   flex-direction: column;
@@ -420,7 +410,6 @@ body { display: flex; }
   transform: translateY(0);
 }
 
-/* ─── BOT RESPONSE FADE-IN ─── */
 @keyframes fadeInContent {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -429,7 +418,6 @@ body { display: flex; }
   animation: fadeInContent 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── IMAGE PREVIEW ─── */
 #imagePreviewContainer {
   max-width: 720px;
   margin: 0 auto;
@@ -466,7 +454,6 @@ body { display: flex; }
 }
 #removeImageBtn:hover { transform: scale(1.1); }
 
-/* ─── INPUT AREA ─── */
 .input-section {
   padding: 12px 20px 16px;
   background: var(--bg-base);
@@ -552,7 +539,6 @@ body { display: flex; }
   letter-spacing: 0.1px;
 }
 
-/* ─── SIDEBAR OVERLAY (MOBILE) ─── */
 .sidebar.overlay {
   display: none;
   position: fixed;
@@ -576,7 +562,6 @@ body { display: flex; }
   backdrop-filter: blur(2px);
 }
 
-/* ─── DELETE POPUP ─── */
 .popup-backdrop {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.65);
@@ -619,7 +604,6 @@ body { display: flex; }
 .popup-delete { background: rgba(224,82,82,0.15); color: #e05252; border: 1px solid rgba(224,82,82,0.3); }
 .popup-delete:hover { background: rgba(224,82,82,0.25); }
 
-/* ─── RESPONSIVE ─── */
 @media (max-width: 700px) {
   body { flex-direction: column; }
   .sidebar:not(.overlay) { display: none; }
@@ -636,7 +620,6 @@ body { display: flex; }
 </head>
 <body>
 
-<!-- ── DESKTOP SIDEBAR ── -->
 <div class="sidebar">
   <div class="sidebar-header">
     <div class="logo">
@@ -655,17 +638,14 @@ body { display: flex; }
   <div class="chat-list"></div>
 </div>
 
-<!-- ── CHAT WRAPPER ── -->
 <div class="chat-wrapper">
 
-  <!-- MOBILE TOPBAR -->
   <div class="mobile-topbar">
     <button id="mobileMenuBtn" class="hamburger-btn">☰</button>
     <span class="mobile-title">QuantumX</span>
     <button id="loginBtnMobile" class="settings-btn">⚙</button>
   </div>
 
-  <!-- MESSAGES -->
   <div id="chat">
     <div class="chat-inner" id="chatInner">
       <div class="empty-state">
@@ -676,7 +656,6 @@ body { display: flex; }
     </div>
   </div>
 
-  <!-- IMAGE PREVIEW -->
   <div id="imagePreviewContainer" style="display:none;">
     <div class="img-preview-inner">
       <img id="imagePreview" src="" alt="Preview">
@@ -684,7 +663,6 @@ body { display: flex; }
     </div>
   </div>
 
-  <!-- INPUT -->
   <div class="input-section">
     <div class="input-box">
       <button id="uploadBtn" title="Lampirkan gambar">
@@ -699,7 +677,6 @@ body { display: flex; }
   </div>
 </div>
 
-<!-- ── MOBILE SIDEBAR OVERLAY ── -->
 <div class="sidebar overlay">
   <div class="sidebar-header">
     <div class="logo">
@@ -718,7 +695,6 @@ body { display: flex; }
 </div>
 <div class="sidebar-backdrop"></div>
 
-<!-- ── DELETE POPUP ── -->
 <div id="deletePopup" class="popup-backdrop">
   <div class="popup-box">
     <h3>Hapus Obrolan?</h3>
@@ -753,7 +729,6 @@ document.getElementById("userNameDisplayMobileOverlay").textContent = senderId;
 
 let currentChatId = null;
 
-// ── AUTO-RESIZE TEXTAREA ──
 input.addEventListener("input", () => {
   input.style.height = "auto";
   input.style.height = Math.min(input.scrollHeight, 150) + "px";
@@ -876,7 +851,6 @@ async function typeMessage(el, text) {
   }
 }
 
-// ── IMAGE UPLOAD ──
 const uploadBtn = document.getElementById("uploadBtn");
 const imagePreviewContainer = document.getElementById("imagePreviewContainer");
 const imagePreview = document.getElementById("imagePreview");
@@ -938,7 +912,6 @@ async function renderBotMessageWithCode(container, text) {
   }
 }
 
-// ── SMART LOADING SYSTEM ──
 const smartLoadingTexts = [
   "Sedang memahami pertanyaan...",
   "Mencari informasi yang relevan...",
@@ -966,11 +939,9 @@ function createSmartLoader() {
   let cycleInterval = null;
   let smartTimeout = null;
 
-  // Setelah 700ms, mulai tampilkan teks dinamis
   smartTimeout = setTimeout(() => {
     idx = 0;
     txt.textContent = smartLoadingTexts[0];
-    // Force reflow lalu add class
     requestAnimationFrame(() => {
       requestAnimationFrame(() => { txt.classList.add("visible"); });
     });
@@ -1040,7 +1011,6 @@ async function sendMsg() {
 
   saveMemory();
 
-  // ── Buat bot bubble dengan smart loader ──
   const botMsg = document.createElement("div");
   botMsg.classList.add("msg", "bot");
 
@@ -1050,7 +1020,14 @@ async function sendMsg() {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    let payload = { sender: senderId, message: text };
+    // 🔥 YANG DIUBAH: TAMBAHIN MODE DI PAYLOAD
+    const mode = localStorage.getItem("aiMode") || "normal";
+    
+    let payload = { 
+      sender: senderId, 
+      message: text,
+      mode: mode  // <-- INI DOANG YANG DITAMBAHIN
+    };
     let apiEndpoint = `${backendUrl}/api/ai`;
     if (imageToSend) { payload.image = imageToSend; apiEndpoint = `${backendUrl}/api/ai-image`; }
 
@@ -1062,11 +1039,9 @@ async function sendMsg() {
     if (!res.ok) throw new Error("HTTP error");
     const data = await res.json();
 
-    // Stop loader & fade out sebelum render
     loader.stop();
 
     if (Array.isArray(data.replies)) {
-      // Fade out loader
       loader.el.style.transition = "opacity 0.3s ease";
       loader.el.style.opacity = "0";
       await new Promise(r => setTimeout(r, 300));
@@ -1099,13 +1074,11 @@ async function sendMsg() {
       return;
     }
 
-    // Smooth fade-out loader, kemudian render konten
     loader.el.style.transition = "opacity 0.3s ease";
     loader.el.style.opacity = "0";
     await new Promise(r => setTimeout(r, 300));
     loader.el.remove();
 
-    // Delay kecil natural sebelum mulai typing — biar terasa "AI berpikir"
     await new Promise(r => setTimeout(r, 80));
 
     if (reply.trim().startsWith("<")) {
@@ -1204,14 +1177,12 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
   closePopup();
 };
 
-// ── MOBILE SIDEBAR ──
 document.getElementById("mobileMenuBtn").addEventListener("click", () => {
   document.querySelector(".sidebar.overlay").classList.add("show");
   document.querySelector(".sidebar-backdrop").style.display = "block";
 });
 document.querySelector(".sidebar-backdrop").addEventListener("click", closeMobileSidebar);
 
-// ── NEW CHAT ──
 document.querySelectorAll(".new-chat-btn").forEach(btn => {
   btn.addEventListener("click", async () => {
     try {
@@ -1261,7 +1232,6 @@ function saveMemory() {
   localStorage.setItem("senderId", senderId);
 }
 
-// ── INIT ──
 renderChatList();
 const activeChatId = localStorage.getItem("activeChatId");
 if (activeChatId && chatMemory[activeChatId]) {

@@ -529,10 +529,8 @@
     Konfigurasi AI berhasil diperbarui
 </div>
 
-<!-- JAVASCRIPT (TETAP SAMA) -->
 <script>
-let selectedModel = "normal"; 
-let aiMode = localStorage.getItem("aiMode") || "normal";
+let selectedModel = "normal";
 
 function goAdmin() {
     window.location.href = "admin.html";
@@ -548,18 +546,29 @@ function selectAI(mode) {
     document.getElementById("optDark").classList.remove("ai-selected");
     document.getElementById("optNormal").classList.remove("ai-selected");
 
-    if (mode === "dark") document.getElementById("optDark").classList.add("ai-selected");
-    if (mode === "normal") document.getElementById("optNormal").classList.add("ai-selected");
+    if (mode === "dark") {
+        document.getElementById("optDark").classList.add("ai-selected");
+    } else {
+        document.getElementById("optNormal").classList.add("ai-selected");
+    }
 }
 
 function confirmAI() {
+    const mode = selectedModel;
+    
+    // Update UI
     document.getElementById("currentModel").innerText = 
-        selectedModel === "dark" ? "Dark" : "Normal";
-
+        mode === "dark" ? "Dark" : "Normal";
     document.getElementById("popupAI").style.display = "none";
 
-    localStorage.setItem("aiMode", selectedModel.toLowerCase());
+    // 🔥 SIMPAN KE LOCALSTORAGE
+    localStorage.setItem("aiMode", mode);
     localStorage.setItem("aiShouldReset", "yes");
+
+    // 🔥 LOG BUAT DEBUG
+    console.log(`✅ Mode disimpan: ${mode}`);
+    console.log(`📌 localStorage aiMode: ${localStorage.getItem("aiMode")}`);
+    console.log(`📌 localStorage aiShouldReset: ${localStorage.getItem("aiShouldReset")}`);
 
     showNotif();
 }
@@ -580,8 +589,13 @@ window.onload = () => {
     document.getElementById("currentModel").innerText =
         saved === "dark" ? "Dark" : "Normal";
 
-    if (saved === "dark") selectAI("dark");
-    else selectAI("normal");
+    if (saved === "dark") {
+        selectAI("dark");
+    } else {
+        selectAI("normal");
+    }
+
+    console.log(`📌 Load settings: mode = ${saved}`);
 };
 </script>
 
