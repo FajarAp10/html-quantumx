@@ -367,6 +367,114 @@ body { display: flex; }
 }
 .copy-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
+/* ─── LOADING GENERATE GAMBAR ─── */
+.image-loading-box {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 160px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+}
+
+.image-loading-box .shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255,255,255,0.03) 45%,
+    rgba(255,255,255,0.05) 55%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.image-loading-box .loading-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  animation: pulseIcon 1.4s infinite;
+  z-index: 1;
+}
+
+@keyframes pulseIcon {
+  0%,100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.image-loading-box .loading-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.image-loading-box .loading-text .dots::after {
+  content: '';
+  animation: dots 1.4s infinite;
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+.image-loading-box .loading-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  z-index: 1;
+}
+
+.image-loading-box .loading-progress {
+  width: 80%;
+  height: 3px;
+  background: var(--bg-surface);
+  border-radius: 99px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.image-loading-box .loading-progress .bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #6a9ff8);
+  border-radius: 99px;
+  animation: progressBar 3s ease-in-out infinite;
+}
+
+@keyframes progressBar {
+  0% { width: 5%; }
+  50% { width: 60%; }
+  100% { width: 90%; }
+}
+
 .smart-loading-wrap {
   display: flex;
   flex-direction: column;
@@ -615,6 +723,7 @@ body { display: flex; }
   .msg { max-width: 92% !important; }
   .msg.bot { max-width: 96% !important; }
   .input-hint { display: none; }
+  .image-loading-box { max-width: 100%; min-height: 120px; }
 }
 </style>
 </head>
@@ -729,6 +838,10 @@ document.getElementById("userNameDisplayMobileOverlay").textContent = senderId;
 
 let currentChatId = null;
 
+// ── PENDING REQUESTS ──
+let pendingRequest = null;
+let isProcessing = false;
+
 input.addEventListener("input", () => {
   input.style.height = "auto";
   input.style.height = Math.min(input.scrollHeight, 150) + "px";
@@ -757,6 +870,23 @@ function getOrCreateChatInner() {
     chatBox.appendChild(inner);
   }
   return inner;
+}
+
+// ── CREATE IMAGE LOADING BOX ──
+function createImageLoadingBox() {
+  const box = document.createElement("div");
+  box.className = "image-loading-box";
+  box.dataset.type = "image-loading";
+  
+  box.innerHTML = `
+    <div class="shimmer"></div>
+    <div class="loading-icon">🎨</div>
+    <div class="loading-text">Sedang membuat gambar<span class="dots"></span></div>
+    <div class="loading-sub">Proses kreatif sedang berjalan...</div>
+    <div class="loading-progress"><div class="bar"></div></div>
+  `;
+  
+  return box;
 }
 
 async function addMessage(type, text) {
@@ -966,6 +1096,80 @@ function createSmartLoader() {
   return { el: wrap, stop };
 }
 
+// ── GENERATE GAMBAR ──
+async function generateImage(prompt) {
+  const mode = localStorage.getItem("aiMode") || "normal";
+  
+  // Tampilkan loading box
+  const inner = getOrCreateChatInner();
+  const empty = inner.querySelector(".empty-state");
+  if (empty) empty.remove();
+  
+  const loadingBox = createImageLoadingBox();
+  const msgWrapper = document.createElement("div");
+  msgWrapper.classList.add("msg", "bot");
+  msgWrapper.appendChild(loadingBox);
+  inner.appendChild(msgWrapper);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  
+  try {
+    const res = await fetch(`${backendUrl}/api/generate-image`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        sender: senderId, 
+        prompt: prompt,
+        mode: mode 
+      })
+    });
+    
+    const data = await res.json();
+    
+    // Hapus loading box
+    msgWrapper.remove();
+    
+    if (data.error) {
+      await addMessage("bot", "❌ " + data.error);
+      return;
+    }
+    
+    if (data.image) {
+      // Tampilkan gambar di chat
+      const msg = document.createElement("div");
+      msg.classList.add("msg", "bot");
+      
+      const img = document.createElement("img");
+      img.src = data.image;
+      img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
+      msg.appendChild(img);
+      
+      if (data.text) {
+        const textDiv = document.createElement("div");
+        textDiv.classList.add("msg-content");
+        textDiv.textContent = data.text;
+        msg.appendChild(textDiv);
+      }
+      
+      inner.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      // Simpan ke memory
+      chatMemory[currentChatId].push({ 
+        role: "assistant", 
+        content: data.text || "Gambar berhasil dibuat!",
+        image: data.image 
+      });
+      saveMemory();
+      
+      if (data.remaining !== undefined) updateLimitUI(data.remaining);
+    }
+  } catch (err) {
+    console.error(err);
+    msgWrapper.remove();
+    await addMessage("bot", "❌ Gagal membuat gambar: " + err.message);
+  }
+}
+
 // ── SEND MESSAGE ──
 async function sendMsg() {
   const text = input.value.trim();
@@ -988,6 +1192,30 @@ async function sendMsg() {
     isNewChat = true;
   } else {
     initChatMemory(currentChatId);
+  }
+
+  // ── DETEKSI PERMINTAAN GAMBAR ──
+  const isImageRequest = text.toLowerCase().includes("buat gambar") || 
+                         text.toLowerCase().includes("generate gambar") ||
+                         text.toLowerCase().includes("bikin gambar") ||
+                         text.toLowerCase().startsWith("/image");
+  
+  if (isImageRequest && text && !imageToSend) {
+    // Tampilkan pesan user dulu
+    await addMessage("user", text);
+    chatMemory[currentChatId].push({ role: "user", content: text });
+    
+    if (isNewChat) {
+      const title = await generateTitle(text);
+      chatNames[currentChatId] = title;
+      renderChatList();
+    }
+    saveMemory();
+    
+    // Generate gambar
+    await generateImage(text);
+    sendBtn.disabled = false;
+    return;
   }
 
   if (imageToSend) {
@@ -1020,16 +1248,19 @@ async function sendMsg() {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    // 🔥 YANG DIUBAH: TAMBAHIN MODE DI PAYLOAD
     const mode = localStorage.getItem("aiMode") || "normal";
     
     let payload = { 
       sender: senderId, 
       message: text,
-      mode: mode  // <-- INI DOANG YANG DITAMBAHIN
+      mode: mode
     };
     let apiEndpoint = `${backendUrl}/api/ai`;
-    if (imageToSend) { payload.image = imageToSend; apiEndpoint = `${backendUrl}/api/ai-image`; }
+    if (imageToSend) { 
+      payload.image = imageToSend; 
+      payload.mode = mode;
+      apiEndpoint = `${backendUrl}/api/ai-image`; 
+    }
 
     const res = await fetch(apiEndpoint, {
       method: "POST",
