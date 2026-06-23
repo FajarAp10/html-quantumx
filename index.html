@@ -367,7 +367,6 @@ body { display: flex; }
 }
 .copy-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-/* ─── LOADING GENERATE GAMBAR ─── */
 .image-loading-box {
   background: var(--bg-elevated);
   border-radius: var(--radius-lg);
@@ -838,10 +837,6 @@ document.getElementById("userNameDisplayMobileOverlay").textContent = senderId;
 
 let currentChatId = null;
 
-// ── PENDING REQUESTS ──
-let pendingRequest = null;
-let isProcessing = false;
-
 input.addEventListener("input", () => {
   input.style.height = "auto";
   input.style.height = Math.min(input.scrollHeight, 150) + "px";
@@ -872,12 +867,10 @@ function getOrCreateChatInner() {
   return inner;
 }
 
-// ── CREATE IMAGE LOADING BOX ──
 function createImageLoadingBox() {
   const box = document.createElement("div");
   box.className = "image-loading-box";
   box.dataset.type = "image-loading";
-  
   box.innerHTML = `
     <div class="shimmer"></div>
     <div class="loading-icon">🎨</div>
@@ -885,7 +878,6 @@ function createImageLoadingBox() {
     <div class="loading-sub">Proses kreatif sedang berjalan...</div>
     <div class="loading-progress"><div class="bar"></div></div>
   `;
-  
   return box;
 }
 
@@ -1100,7 +1092,6 @@ function createSmartLoader() {
 async function generateImage(prompt) {
   const mode = localStorage.getItem("aiMode") || "normal";
   
-  // Tampilkan loading box
   const inner = getOrCreateChatInner();
   const empty = inner.querySelector(".empty-state");
   if (empty) empty.remove();
@@ -1124,8 +1115,6 @@ async function generateImage(prompt) {
     });
     
     const data = await res.json();
-    
-    // Hapus loading box
     msgWrapper.remove();
     
     if (data.error) {
@@ -1134,14 +1123,32 @@ async function generateImage(prompt) {
     }
     
     if (data.image) {
-      // Tampilkan gambar di chat
       const msg = document.createElement("div");
       msg.classList.add("msg", "bot");
       
       const img = document.createElement("img");
-      img.src = data.image;
-      img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
-      msg.appendChild(img);
+      
+      // 🔥 CEK APAKAH URL ATAU BASE64
+      if (data.image.startsWith("http://") || data.image.startsWith("https://")) {
+        img.src = data.image;
+        img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
+        img.alt = "Gambar dari Pollinations.ai";
+        img.loading = "lazy";
+        
+        // Tambah link buat buka di tab baru
+        const link = document.createElement("a");
+        link.href = data.image;
+        link.target = "_blank";
+        link.style.cssText = "font-size:12px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:4px;";
+        link.textContent = "🔗 Buka gambar di tab baru";
+        
+        msg.appendChild(img);
+        msg.appendChild(link);
+      } else {
+        img.src = data.image;
+        img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
+        msg.appendChild(img);
+      }
       
       if (data.text) {
         const textDiv = document.createElement("div");
@@ -1153,7 +1160,6 @@ async function generateImage(prompt) {
       inner.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
       
-      // Simpan ke memory
       chatMemory[currentChatId].push({ 
         role: "assistant", 
         content: data.text || "Gambar berhasil dibuat!",
@@ -1194,51 +1200,34 @@ async function sendMsg() {
     initChatMemory(currentChatId);
   }
 
- // ── DETEKSI PERMINTAAN GAMBAR ── (VERSI SUPER LENGKAP)
-const imageKeywords = [
-  // Prefix command
-  "/image", "/img", "/gambar", "/generate", "/gen", "/create", "/draw",
-  
-  // Bahasa Indonesia - variasi "buat"
-  "buat gambar", "buatkan gambar", "bikin gambar", "bikinin gambar", 
-  "buat gambar", "buatin gambar", "bikinin gambar", "bikin gambar",
-  "tolong buatkan gambar", "tolong bikin gambar", "minta gambar",
-  
-  // Bahasa Indonesia - kata kerja lain
-  "gambarkan", "gambarin", "lukis", "lukisin", "lukiskan",
-  "hasil gambar", "ciptakan gambar", "kreasi gambar",
-  "generate gambar", "generated gambar", "generating gambar",
-  
-  // Bahasa Indonesia - kata benda
-  "gambar kucing", "gambar anime", "gambar pemandangan", "gambar kartun",
-  "gambar abstrak", "gambar realistik", "gambar 3d", "gambar ilustrasi",
-  "gambar robot", "gambar bunga", "gambar mobil", "gambar rumah",
-  "gambar gedung", "gambar laut", "gambar gunung", "gambar pantai",
-  "gambar hutan", "gambar hewan", "gambar manusia", "gambar makanan",
-  "gambar minuman", "gambar pemandangan", "gambar alam", "gambar fantasi",
-  "gambar anime", "gambar kartun", "gambar manga", "gambar sketsa",
-  "gambar doodle", "gambar minimalis", "gambar vintage", "gambar modern",
-  
-  // Bahasa Indonesia - kalimat perintah
-  "buatin dong gambar", "bikinin dong gambar", "gambar dong",
-  "minta gambar", "mau gambar", "ingin gambar", "butuh gambar",
-  
-  // Bahasa Inggris
-  "create image", "generate image", "make image", "draw image",
-  "create picture", "generate picture", "make picture", "draw picture",
-  "image of", "picture of", "photo of", "illustration of",
-  
-  // Campuran
-  "make a image", "make an image", "create an image", "generate an image",
-  "buatkan image", "bikinin image", "gambar image",
-];
+  const imageKeywords = [
+    "/image", "/img", "/gambar", "/generate", "/gen", "/create", "/draw",
+    "buat gambar", "buatkan gambar", "bikin gambar", "bikinin gambar", 
+    "buatin gambar", "tolong buatkan gambar", "tolong bikin gambar", "minta gambar",
+    "gambarkan", "gambarin", "lukis", "lukisin", "lukiskan",
+    "hasil gambar", "ciptakan gambar", "kreasi gambar",
+    "generate gambar", "generated gambar", "generating gambar",
+    "gambar kucing", "gambar anime", "gambar pemandangan", "gambar kartun",
+    "gambar abstrak", "gambar realistik", "gambar 3d", "gambar ilustrasi",
+    "gambar robot", "gambar bunga", "gambar mobil", "gambar rumah",
+    "gambar gedung", "gambar laut", "gambar gunung", "gambar pantai",
+    "gambar hutan", "gambar hewan", "gambar manusia", "gambar makanan",
+    "gambar minuman", "gambar alam", "gambar fantasi", "gambar manga",
+    "gambar sketsa", "gambar doodle", "gambar minimalis", "gambar vintage",
+    "buatin dong gambar", "bikinin dong gambar", "gambar dong",
+    "minta gambar", "mau gambar", "ingin gambar", "butuh gambar",
+    "create image", "generate image", "make image", "draw image",
+    "create picture", "generate picture", "make picture", "draw picture",
+    "image of", "picture of", "photo of", "illustration of",
+    "make a image", "make an image", "create an image", "generate an image",
+    "buatkan image", "bikinin image", "gambar image"
+  ];
 
-const isImageRequest = imageKeywords.some(keyword => 
-  text.toLowerCase().includes(keyword)
-);
+  const isImageRequest = imageKeywords.some(keyword => 
+    text.toLowerCase().includes(keyword)
+  );
   
   if (isImageRequest && text && !imageToSend) {
-    // Tampilkan pesan user dulu
     await addMessage("user", text);
     chatMemory[currentChatId].push({ role: "user", content: text });
     
@@ -1249,7 +1238,6 @@ const isImageRequest = imageKeywords.some(keyword =>
     }
     saveMemory();
     
-    // Generate gambar
     await generateImage(text);
     sendBtn.disabled = false;
     return;
