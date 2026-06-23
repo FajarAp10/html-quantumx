@@ -7,734 +7,113 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg-base: #0e0f11;
-  --bg-surface: #141518;
-  --bg-elevated: #1a1c20;
-  --bg-hover: #1f2126;
-  --bg-input: #16181d;
-  --border: #242629;
-  --border-active: #2e3036;
-  --accent: #4f8ef7;
-  --accent-dim: rgba(79,142,247,0.12);
-  --accent-glow: rgba(79,142,247,0.06);
-  --text-primary: #e8eaed;
-  --text-secondary: #8a8f9a;
-  --text-muted: #4a4f5a;
-  --user-bg: #1d2535;
-  --user-border: #263046;
-  --bot-bg: #141518;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
-  --font: 'Sora', system-ui, sans-serif;
-  --sidebar-w: 256px;
-  --transition: 0.18s ease;
-}
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-html, body {
-  height: 100%;
-  overflow: hidden;
-  font-family: var(--font);
-  background: var(--bg-base);
-  color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-}
-
-body { display: flex; }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 18px 14px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  padding: 0 4px;
-}
-
-.logo {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo-dot {
-  width: 8px; height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent);
-  animation: pulse 2.5s infinite;
-}
-
-@keyframes pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
-}
-
-#limitCounter, #limitCounterOverlay {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--accent);
-  background: var(--accent-dim);
-  padding: 2px 8px;
-  border-radius: 99px;
-}
-
-.settings-btn {
-  width: 32px; height: 32px;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px;
-  transition: var(--transition);
-}
-.settings-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-active); }
-
-.user-tag {
-  font-size: 11px;
-  color: var(--text-muted);
-  padding: 0 4px;
-  margin-bottom: 14px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-}
-
-.new-chat-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-active);
-  background: var(--accent-glow);
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font);
-  cursor: pointer;
-  transition: var(--transition);
-  margin-bottom: 16px;
-  width: 100%;
-  text-align: left;
-}
-.new-chat-btn:hover { background: var(--accent-dim); border-color: var(--accent); }
-.new-chat-btn svg { opacity: 0.7; flex-shrink: 0; }
-
-.section-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  padding: 0 4px;
-  margin-bottom: 8px;
-}
-
-.chat-list {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.chat-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: var(--transition);
-  min-width: 0;
-}
-.chat-item:hover { background: var(--bg-hover); border-color: var(--border); }
-.chat-item span {
-  font-size: 13px;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  transition: color var(--transition);
-}
-.chat-item:hover span { color: var(--text-primary); }
-.chat-item .del-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 13px;
-  opacity: 0;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: var(--transition);
-  flex-shrink: 0;
-  line-height: 1;
-}
-.chat-item:hover .del-btn { opacity: 1; }
-.chat-item .del-btn:hover { color: #e05252; background: rgba(224,82,82,0.1); }
-
-.chat-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.mobile-topbar {
-  display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.mobile-title { font-size: 17px; font-weight: 700; flex: 1; letter-spacing: -0.2px; }
-.hamburger-btn {
-  width: 38px; height: 38px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  transition: var(--transition);
-}
-.hamburger-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-#chat {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 28px 0 36px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-.chat-inner {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.empty-state {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  pointer-events: none;
-  user-select: none;
-}
-.empty-state .empty-icon {
-  width: 48px; height: 48px;
-  background: var(--accent-dim);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 22px;
-}
-.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
-.empty-state p { font-size: 14px; color: var(--text-muted); }
-
-.msg {
-  display: flex;
-  flex-direction: column;
-  max-width: 85%;
-  animation: msgIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform, opacity;
-}
-.msg.user { align-self: flex-end; }
-.msg.bot { align-self: flex-start; max-width: 92%; }
-
-@keyframes msgIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.msg-content {
-  padding: 12px 16px;
-  font-size: 14.5px;
-  line-height: 1.75;
-  border-radius: var(--radius-lg);
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
-  max-width: 100%;
-}
-
-.msg.user .msg-content {
-  background: var(--user-bg);
-  border: 1px solid var(--user-border);
-  border-radius: var(--radius-xl) var(--radius-xl) 4px var(--radius-xl);
-  color: var(--text-primary);
-  box-shadow: 0 2px 12px rgba(79,142,247,0.07);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
-}
-.msg.user:hover .msg-content {
-  box-shadow: 0 4px 22px rgba(79,142,247,0.14);
-  border-color: rgba(79,142,247,0.35);
-}
-
-.msg.bot {
-  background: var(--bot-bg);
-  border: 1px solid var(--border);
-  border-radius: 4px var(--radius-xl) var(--radius-xl) var(--radius-xl);
-  padding: 14px 18px;
-  gap: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
-}
-.msg.bot:hover {
-  border-color: var(--border-active);
-  box-shadow: 0 5px 24px rgba(0,0,0,0.28);
-}
-.msg.bot .msg-content {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-}
-
-.code-block-wrapper { position: relative; }
-.code-block {
-  background: #0a0b0d;
-  border: 1px solid var(--border-active);
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  font-family: 'Menlo', 'Monaco', monospace;
-  font-size: 13px;
-  white-space: pre-wrap;
-  overflow-x: hidden;
-  color: #7dd3a8;
-  line-height: 1.6;
-  margin-top: 4px;
-  word-break: break-all;
-}
-.copy-btn {
-  position: absolute;
-  top: 10px; right: 10px;
-  font-size: 11px;
-  font-family: var(--font);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-active);
-  color: var(--text-secondary);
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.copy-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-.image-loading-box {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  min-height: 160px;
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 400px;
-}
-
-.image-loading-box .shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255,255,255,0.03) 45%,
-    rgba(255,255,255,0.05) 55%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.8s infinite;
-  pointer-events: none;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.image-loading-box .loading-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-active);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  animation: pulseIcon 1.4s infinite;
-  z-index: 1;
-}
-
-@keyframes pulseIcon {
-  0%,100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-.image-loading-box .loading-text {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.image-loading-box .loading-text .dots::after {
-  content: '';
-  animation: dots 1.4s infinite;
-}
-
-@keyframes dots {
-  0% { content: ''; }
-  25% { content: '.'; }
-  50% { content: '..'; }
-  75% { content: '...'; }
-}
-
-.image-loading-box .loading-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  z-index: 1;
-}
-
-.image-loading-box .loading-progress {
-  width: 80%;
-  height: 3px;
-  background: var(--bg-surface);
-  border-radius: 99px;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.image-loading-box .loading-progress .bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent), #6a9ff8);
-  border-radius: 99px;
-  animation: progressBar 3s ease-in-out infinite;
-}
-
-@keyframes progressBar {
-  0% { width: 5%; }
-  50% { width: 60%; }
-  100% { width: 90%; }
-}
-
-.smart-loading-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 28px;
-}
-
-.loading-dots {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  height: 18px;
-  padding: 2px 0;
-}
-.loading-dots span {
-  width: 5px; height: 5px;
-  background: var(--text-muted);
-  border-radius: 50%;
-  animation: dotBounce 1.4s infinite ease-in-out;
-}
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.18s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.36s; }
-@keyframes dotBounce {
-  0%,80%,100% { opacity: 0.2; transform: translateY(0); }
-  40% { opacity: 1; transform: translateY(-4px); }
-}
-
-.smart-loading-text {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  font-style: italic;
-  letter-spacing: 0.15px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  line-height: 1.4;
-}
-.smart-loading-text.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@keyframes fadeInContent {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.msg-content-reveal {
-  animation: fadeInContent 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-#imagePreviewContainer {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 20px 8px;
-  width: 100%;
-}
-.img-preview-inner {
-  position: relative;
-  display: inline-block;
-  max-width: 160px;
-}
-#imagePreview {
-  display: block;
-  width: 100%;
-  max-height: 100px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-active);
-  object-fit: cover;
-}
-#removeImageBtn {
-  position: absolute;
-  top: -6px; right: -6px;
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: #e05252;
-  color: white;
-  border: none;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  transition: transform var(--transition);
-}
-#removeImageBtn:hover { transform: scale(1.1); }
-
-.input-section {
-  padding: 12px 20px 16px;
-  background: var(--bg-base);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.input-box {
-  max-width: 720px;
-  margin: 0 auto;
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-active);
-  border-radius: var(--radius-xl);
-  padding: 10px 12px;
-  transition: border-color 0.22s ease, box-shadow 0.22s ease;
-}
-.input-box:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim), 0 4px 20px rgba(79,142,247,0.08);
-}
-
-#uploadBtn {
-  width: 34px; height: 34px;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-  transition: var(--transition);
-  flex-shrink: 0;
-  line-height: 1;
-}
-#uploadBtn:hover { color: var(--text-secondary); background: var(--bg-hover); border-radius: var(--radius-sm); }
-
-#msg {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text-primary);
-  font-family: var(--font);
-  font-size: 14.5px;
-  line-height: 1.6;
-  resize: none;
-  min-height: 24px;
-  max-height: 150px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  word-break: break-word;
-  padding: 4px 0;
-  display: block;
-}
-#msg::placeholder { color: var(--text-muted); }
-#msg::-webkit-scrollbar { width: 3px; }
-#msg::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 99px; }
-
-#sendBtn {
-  width: 34px; height: 34px;
-  border-radius: 10px;
-  background: var(--accent);
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: var(--transition);
-  flex-shrink: 0;
-  opacity: 0.9;
-}
-#sendBtn:hover { opacity: 1; transform: scale(1.05); box-shadow: 0 4px 18px rgba(79,142,247,0.38); }
-#sendBtn:active { transform: scale(0.95); }
-#sendBtn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
-#sendBtn svg { pointer-events: none; }
-
-.input-hint {
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 8px;
-  letter-spacing: 0.1px;
-}
-
-.sidebar.overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: -300px;
-  height: 100%; width: var(--sidebar-w);
-  z-index: 200;
-  background: var(--bg-surface);
-  padding: 18px 14px;
-  border-right: 1px solid var(--border);
-  transition: left 0.28s cubic-bezier(0.16,1,0.3,1);
-  box-shadow: 4px 0 24px rgba(0,0,0,0.5);
-  flex-direction: column;
-  flex-shrink: 0;
-}
-.sidebar.overlay.show { left: 0; }
-.sidebar-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  z-index: 100;
-  backdrop-filter: blur(2px);
-}
-
-.popup-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  backdrop-filter: blur(4px);
-}
-.popup-box {
-  background: var(--bg-surface);
-  padding: 24px;
-  width: 90%;
-  max-width: 320px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-active);
-  box-shadow: var(--shadow);
-  text-align: center;
-  animation: popupIn 0.2s cubic-bezier(0.16,1,0.3,1);
-}
-@keyframes popupIn {
-  from { transform: scale(0.88); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.popup-box h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
-.popup-box p { font-size: 13px; margin-bottom: 20px; color: var(--text-secondary); }
-.popup-btns { display: flex; gap: 10px; }
-.popup-btn {
-  flex: 1; padding: 10px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-weight: 600;
-  border: none;
-  font-size: 13px;
-  font-family: var(--font);
-  transition: var(--transition);
-}
-.popup-cancel { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border-active); }
-.popup-cancel:hover { background: var(--bg-hover); }
-.popup-delete { background: rgba(224,82,82,0.15); color: #e05252; border: 1px solid rgba(224,82,82,0.3); }
-.popup-delete:hover { background: rgba(224,82,82,0.25); }
-
-@media (max-width: 700px) {
-  body { flex-direction: column; }
-  .sidebar:not(.overlay) { display: none; }
-  .sidebar.overlay { display: flex; }
-  .mobile-topbar { display: flex; }
-  .chat-inner { padding: 0 14px; gap: 10px; }
-  #imagePreviewContainer { padding: 0 14px 8px; }
-  .input-section { padding: 10px 14px 14px; }
-  .msg { max-width: 92% !important; }
-  .msg.bot { max-width: 96% !important; }
-  .input-hint { display: none; }
-  .image-loading-box { max-width: 100%; min-height: 120px; }
-}
+:root{--bg-base:#0e0f11;--bg-surface:#141518;--bg-elevated:#1a1c20;--bg-hover:#1f2126;--bg-input:#16181d;--border:#242629;--border-active:#2e3036;--accent:#4f8ef7;--accent-dim:rgba(79,142,247,0.12);--accent-glow:rgba(79,142,247,0.06);--text-primary:#e8eaed;--text-secondary:#8a8f9a;--text-muted:#4a4f5a;--user-bg:#1d2535;--user-border:#263046;--bot-bg:#141518;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--shadow:0 4px 24px rgba(0,0,0,0.3);--shadow-sm:0 2px 8px rgba(0,0,0,0.2);--font:'Sora',system-ui,sans-serif;--sidebar-w:256px;--transition:0.18s ease}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg-base);color:var(--text-primary);-webkit-font-smoothing:antialiased}
+body{display:flex}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-active);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+.sidebar{width:var(--sidebar-w);background:var(--bg-surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px;flex-shrink:0;overflow:hidden}
+.sidebar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 4px}
+.logo{font-size:17px;font-weight:700;letter-spacing:-0.3px;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}
+#limitCounter,#limitCounterOverlay{font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-dim);padding:2px 8px;border-radius:99px}
+.settings-btn{width:32px;height:32px;border-radius:var(--radius-sm);background:transparent;border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:var(--transition)}
+.settings-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-active)}
+.user-tag{font-size:11px;color:var(--text-muted);padding:0 4px;margin-bottom:14px;font-weight:500;letter-spacing:0.2px}
+.new-chat-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-md);border:1px solid var(--border-active);background:var(--accent-glow);color:var(--text-primary);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:var(--transition);margin-bottom:16px;width:100%;text-align:left}
+.new-chat-btn:hover{background:var(--accent-dim);border-color:var(--accent)}
+.new-chat-btn svg{opacity:0.7;flex-shrink:0}
+.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);padding:0 4px;margin-bottom:8px}
+.chat-list{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:2px}
+.chat-item{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid transparent;transition:var(--transition);min-width:0}
+.chat-item:hover{background:var(--bg-hover);border-color:var(--border)}
+.chat-item span{font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;transition:color var(--transition)}
+.chat-item:hover span{color:var(--text-primary)}
+.chat-item .del-btn{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;opacity:0;padding:2px 4px;border-radius:4px;transition:var(--transition);flex-shrink:0;line-height:1}
+.chat-item:hover .del-btn{opacity:1}
+.chat-item .del-btn:hover{color:#e05252;background:rgba(224,82,82,0.1)}
+.chat-wrapper{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.mobile-topbar{display:none;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.mobile-title{font-size:17px;font-weight:700;flex:1;letter-spacing:-0.2px}
+.hamburger-btn{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:var(--transition)}
+.hamburger-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+#chat{flex:1;overflow-y:auto;overflow-x:hidden;padding:28px 0 36px;display:flex;flex-direction:column;position:relative;min-height:0;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.chat-inner{width:100%;max-width:720px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:12px}
+.empty-state{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;user-select:none}
+.empty-state .empty-icon{width:48px;height:48px;background:var(--accent-dim);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px}
+.empty-state h3{font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.empty-state p{font-size:14px;color:var(--text-muted)}
+.msg{display:flex;flex-direction:column;max-width:85%;animation:msgIn 0.3s cubic-bezier(0.16,1,0.3,1) both;will-change:transform,opacity}
+.msg.user{align-self:flex-end}
+.msg.bot{align-self:flex-start;max-width:92%}
+@keyframes msgIn{from{opacity:0;transform:translateY(14px)scale(0.97)}to{opacity:1;transform:translateY(0)scale(1)}}
+.msg-content{padding:12px 16px;font-size:14.5px;line-height:1.75;border-radius:var(--radius-lg);word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;max-width:100%}
+.msg.user .msg-content{background:var(--user-bg);border:1px solid var(--user-border);border-radius:var(--radius-xl) var(--radius-xl) 4px var(--radius-xl);color:var(--text-primary);box-shadow:0 2px 12px rgba(79,142,247,0.07);transition:box-shadow .25s ease,border-color .25s ease}
+.msg.user:hover .msg-content{box-shadow:0 4px 22px rgba(79,142,247,0.14);border-color:rgba(79,142,247,0.35)}
+.msg.bot{background:var(--bot-bg);border:1px solid var(--border);border-radius:4px var(--radius-xl) var(--radius-xl) var(--radius-xl);padding:14px 18px;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,0.18);transition:box-shadow .25s ease,border-color .25s ease}
+.msg.bot:hover{border-color:var(--border-active);box-shadow:0 5px 24px rgba(0,0,0,0.28)}
+.msg.bot .msg-content{background:transparent!important;border:none!important;padding:0!important;border-radius:0!important}
+.code-block-wrapper{position:relative}
+.code-block{background:#0a0b0d;border:1px solid var(--border-active);padding:14px 16px;border-radius:var(--radius-md);font-family:Menlo,Monaco,monospace;font-size:13px;white-space:pre-wrap;overflow-x:hidden;color:#7dd3a8;line-height:1.6;margin-top:4px;word-break:break-all}
+.copy-btn{position:absolute;top:10px;right:10px;font-size:11px;font-family:var(--font);background:var(--bg-elevated);border:1px solid var(--border-active);color:var(--text-secondary);padding:4px 8px;border-radius:6px;cursor:pointer;transition:var(--transition)}
+.copy-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.smart-loading-wrap{display:flex;flex-direction:column;gap:10px;min-height:28px}
+.loading-dots{display:flex;gap:5px;align-items:center;height:18px;padding:2px 0}
+.loading-dots span{width:5px;height:5px;background:var(--text-muted);border-radius:50%;animation:dotBounce 1.4s infinite ease-in-out}
+.loading-dots span:nth-child(1){animation-delay:0s}
+.loading-dots span:nth-child(2){animation-delay:.18s}
+.loading-dots span:nth-child(3){animation-delay:.36s}
+@keyframes dotBounce{0%,80%,100%{opacity:0.2;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.smart-loading-text{font-size:12.5px;color:var(--text-muted);font-style:italic;letter-spacing:.15px;opacity:0;transform:translateY(4px);transition:opacity .45s ease,transform .45s ease;line-height:1.4}
+.smart-loading-text.visible{opacity:1;transform:translateY(0)}
+@keyframes fadeInContent{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.msg-content-reveal{animation:fadeInContent .35s cubic-bezier(0.16,1,0.3,1)both}
+#imagePreviewContainer{max-width:720px;margin:0 auto;padding:0 20px 8px;width:100%}
+.img-preview-inner{position:relative;display:inline-block;max-width:160px}
+#imagePreview{display:block;width:100%;max-height:100px;border-radius:var(--radius-md);border:1px solid var(--border-active);object-fit:cover}
+#removeImageBtn{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e05252;color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.4);transition:transform var(--transition)}
+#removeImageBtn:hover{transform:scale(1.1)}
+.input-section{padding:12px 20px 16px;background:var(--bg-base);border-top:1px solid var(--border);flex-shrink:0}
+.input-box{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;background:var(--bg-input);border:1px solid var(--border-active);border-radius:var(--radius-xl);padding:10px 12px;transition:border-color .22s ease,box-shadow .22s ease}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim),0 4px 20px rgba(79,142,247,0.08)}
+#uploadBtn{width:34px;height:34px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:var(--transition);flex-shrink:0;line-height:1}
+#uploadBtn:hover{color:var(--text-secondary);background:var(--bg-hover)}
+#msg{flex:1;background:transparent;border:none;outline:none;color:var(--text-primary);font-family:var(--font);font-size:14.5px;line-height:1.6;resize:none;min-height:24px;max-height:150px;overflow-y:auto;overflow-x:hidden;word-break:break-word;padding:4px 0;display:block}
+#msg::placeholder{color:var(--text-muted)}
+#msg::-webkit-scrollbar{width:3px}
+#msg::-webkit-scrollbar-thumb{background:var(--border-active);border-radius:99px}
+#sendBtn{width:34px;height:34px;border-radius:10px;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);flex-shrink:0;opacity:.9}
+#sendBtn:hover{opacity:1;transform:scale(1.05);box-shadow:0 4px 18px rgba(79,142,247,0.38)}
+#sendBtn:active{transform:scale(.95)}
+#sendBtn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+#sendBtn svg{pointer-events:none}
+.input-hint{text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:.1px}
+.sidebar.overlay{display:none;position:fixed;top:0;left:-300px;height:100%;width:var(--sidebar-w);z-index:200;background:var(--bg-surface);padding:18px 14px;border-right:1px solid var(--border);transition:left .28s cubic-bezier(0.16,1,0.3,1);box-shadow:4px 0 24px rgba(0,0,0,0.5);flex-direction:column;flex-shrink:0}
+.sidebar.overlay.show{left:0}
+.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;z-index:100;backdrop-filter:blur(2px)}
+.popup-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;justify-content:center;align-items:center;z-index:999;backdrop-filter:blur(4px)}
+.popup-box{background:var(--bg-surface);padding:24px;width:90%;max-width:320px;border-radius:var(--radius-xl);border:1px solid var(--border-active);box-shadow:var(--shadow);text-align:center;animation:popupIn .2s cubic-bezier(0.16,1,0.3,1)}
+@keyframes popupIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.popup-box h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.popup-box p{font-size:13px;margin-bottom:20px;color:var(--text-secondary)}
+.popup-btns{display:flex;gap:10px}
+.popup-btn{flex:1;padding:10px;border-radius:var(--radius-md);cursor:pointer;font-weight:600;border:none;font-size:13px;font-family:var(--font);transition:var(--transition)}
+.popup-cancel{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-active)}
+.popup-cancel:hover{background:var(--bg-hover)}
+.popup-delete{background:rgba(224,82,82,0.15);color:#e05252;border:1px solid rgba(224,82,82,0.3)}
+.popup-delete:hover{background:rgba(224,82,82,0.25)}
+@media(max-width:700px){body{flex-direction:column}.sidebar:not(.overlay){display:none}.sidebar.overlay{display:flex}.mobile-topbar{display:flex}.chat-inner{padding:0 14px;gap:10px}#imagePreviewContainer{padding:0 14px 8px}.input-section{padding:10px 14px 14px}.msg{max-width:92%!important}.msg.bot{max-width:96%!important}.input-hint{display:none}}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
   <div class="sidebar-header">
-    <div class="logo">
-      <div class="logo-dot"></div>
-      QuantumX
-      <span id="limitCounter">(5)</span>
-    </div>
+    <div class="logo"><div class="logo-dot"></div>QuantumX<span id="limitCounter">(5)</span></div>
     <button id="loginBtnDesktop" class="settings-btn" title="Settings">⚙</button>
   </div>
   <div id="userNameDisplayDesktop" class="user-tag">User-XXXX</div>
@@ -747,7 +126,6 @@ body { display: flex; }
 </div>
 
 <div class="chat-wrapper">
-
   <div class="mobile-topbar">
     <button id="mobileMenuBtn" class="hamburger-btn">☰</button>
     <span class="mobile-title">QuantumX</span>
@@ -756,11 +134,7 @@ body { display: flex; }
 
   <div id="chat">
     <div class="chat-inner" id="chatInner">
-      <div class="empty-state">
-        <div class="empty-icon">✦</div>
-        <h3>QuantumX siap membantu</h3>
-        <p>Ketik pesan untuk memulai percakapan</p>
-      </div>
+      <div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div>
     </div>
   </div>
 
@@ -787,11 +161,7 @@ body { display: flex; }
 
 <div class="sidebar overlay">
   <div class="sidebar-header">
-    <div class="logo">
-      <div class="logo-dot"></div>
-      QuantumX
-      <span id="limitCounterOverlay">(5)</span>
-    </div>
+    <div class="logo"><div class="logo-dot"></div>QuantumX<span id="limitCounterOverlay">(5)</span></div>
   </div>
   <div id="userNameDisplayMobileOverlay" class="user-tag">User-XXXX</div>
   <button class="new-chat-btn">
@@ -815,717 +185,102 @@ body { display: flex; }
 </div>
 
 <script>
-const backendUrl = "https://fajar10-fajaraiquatumx.hf.space";
-const chatBox = document.getElementById("chat");
-const chatInner = document.getElementById("chatInner");
-const input = document.getElementById("msg");
-const sendBtn = document.getElementById("sendBtn");
-const chatLists = document.querySelectorAll(".chat-list");
-const limitCounter = document.getElementById("limitCounter");
-const limitCounterOverlay = document.getElementById("limitCounterOverlay");
+const backendUrl="https://fajar10-fajaraiquatumx.hf.space";
+const chatBox=document.getElementById("chat");
+const chatInner=document.getElementById("chatInner");
+const input=document.getElementById("msg");
+const sendBtn=document.getElementById("sendBtn");
+const chatLists=document.querySelectorAll(".chat-list");
+const limitCounter=document.getElementById("limitCounter");
+const limitCounterOverlay=document.getElementById("limitCounterOverlay");
 
-let chatMemory = JSON.parse(localStorage.getItem("chatMemory") || "{}");
-let chatNames = JSON.parse(localStorage.getItem("chatNames") || "{}");
-let senderId = localStorage.getItem("senderId");
-if (!senderId) {
-  senderId = "User-" + Math.floor(100 + Math.random() * 900);
-  localStorage.setItem("senderId", senderId);
-}
+let chatMemory=JSON.parse(localStorage.getItem("chatMemory")||"{}");
+let chatNames=JSON.parse(localStorage.getItem("chatNames")||"{}");
+let senderId=localStorage.getItem("senderId");
+if(!senderId){senderId="User-"+Math.floor(100+Math.random()*900);localStorage.setItem("senderId",senderId);}
 
-document.getElementById("userNameDisplayDesktop").textContent = senderId;
-document.getElementById("userNameDisplayMobileOverlay").textContent = senderId;
+document.getElementById("userNameDisplayDesktop").textContent=senderId;
+document.getElementById("userNameDisplayMobileOverlay").textContent=senderId;
+let currentChatId=null;
 
-let currentChatId = null;
+input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,150)+"px"});
 
-input.addEventListener("input", () => {
-  input.style.height = "auto";
-  input.style.height = Math.min(input.scrollHeight, 150) + "px";
-});
+function closeMobileSidebar(){document.querySelector(".sidebar.overlay").classList.remove("show");document.querySelector(".sidebar-backdrop").style.display="none";}
 
-function closeMobileSidebar() {
-  document.querySelector(".sidebar.overlay").classList.remove("show");
-  document.querySelector(".sidebar-backdrop").style.display = "none";
-}
+function initChatMemory(chatId){if(!chatMemory[chatId])chatMemory[chatId]=[];if(!chatNames[chatId])chatNames[chatId]="Obrolan Baru";}
 
-function initChatMemory(chatId) {
-  if (!chatMemory[chatId]) chatMemory[chatId] = [];
-  if (!chatNames[chatId]) chatNames[chatId] = "Obrolan Baru";
-}
+function updateLimitUI(limit){if(limitCounter)limitCounter.textContent=`(${limit})`;if(limitCounterOverlay)limitCounterOverlay.textContent=`(${limit})`;}
 
-function updateLimitUI(limit) {
-  if (limitCounter) limitCounter.textContent = `(${limit})`;
-  if (limitCounterOverlay) limitCounterOverlay.textContent = `(${limit})`;
-}
+function getOrCreateChatInner(){let inner=chatBox.querySelector(".chat-inner");if(!inner){inner=document.createElement("div");inner.className="chat-inner";chatBox.appendChild(inner);}return inner;}
 
-function getOrCreateChatInner() {
-  let inner = chatBox.querySelector(".chat-inner");
-  if (!inner) {
-    inner = document.createElement("div");
-    inner.className = "chat-inner";
-    chatBox.appendChild(inner);
-  }
-  return inner;
-}
+async function addMessage(type,text){const inner=getOrCreateChatInner();const empty=inner.querySelector(".empty-state");if(empty)empty.remove();const msg=document.createElement("div");msg.classList.add("msg",type);const parts=text.split(/```/);for(let i=0;i<parts.length;i++){const chunk=parts[i].trim();if(!chunk)continue;if(i%2===0){const div=document.createElement("div");div.classList.add("msg-content");msg.appendChild(div);await typeMessage(div,chunk);}else{msg.appendChild(makeCodeBlock(chunk));}}inner.appendChild(msg);chatBox.scrollTop=chatBox.scrollHeight;}
 
-function createImageLoadingBox() {
-  const box = document.createElement("div");
-  box.className = "image-loading-box";
-  box.dataset.type = "image-loading";
-  box.innerHTML = `
-    <div class="shimmer"></div>
-    <div class="loading-icon">🎨</div>
-    <div class="loading-text">Sedang membuat gambar<span class="dots"></span></div>
-    <div class="loading-sub">Proses kreatif sedang berjalan...</div>
-    <div class="loading-progress"><div class="bar"></div></div>
-  `;
-  return box;
-}
+function renderHistoryMessage(role,content,image=null){const inner=getOrCreateChatInner();const msg=document.createElement("div");msg.classList.add("msg",role);if(image){const div=document.createElement("div");div.classList.add("msg-content");const img=document.createElement("img");img.src=image;img.style.cssText="max-width:100%;border-radius:10px;border:1px solid var(--border)";div.appendChild(img);msg.appendChild(div);}else{const parts=content.split(/```/);for(let i=0;i<parts.length;i++){const chunk=parts[i].trim();if(!chunk)continue;if(i%2===0){const div=document.createElement("div");div.classList.add("msg-content");if(chunk.startsWith("<div"))div.innerHTML=chunk;else div.textContent=chunk;msg.appendChild(div);}else{msg.appendChild(makeCodeBlock(chunk));}}}inner.appendChild(msg);}
 
-async function addMessage(type, text) {
-  const inner = getOrCreateChatInner();
-  const empty = inner.querySelector(".empty-state");
-  if (empty) empty.remove();
+function makeCodeBlock(code){const wrapper=document.createElement("div");wrapper.classList.add("code-block-wrapper");const copyBtn=document.createElement("button");copyBtn.classList.add("copy-btn");copyBtn.textContent="Salin";const codeDiv=document.createElement("div");codeDiv.classList.add("code-block");codeDiv.textContent=code;copyBtn.addEventListener("click",()=>{navigator.clipboard.writeText(code);copyBtn.textContent="✓ Tersalin";setTimeout(()=>copyBtn.textContent="Salin",1500);});wrapper.appendChild(copyBtn);wrapper.appendChild(codeDiv);return wrapper;}
 
-  const msg = document.createElement("div");
-  msg.classList.add("msg", type);
+async function typeMessage(el,text){const THRESHOLD=40;el.textContent="";const animLen=Math.min(text.length,THRESHOLD);for(let i=0;i<animLen;i++){el.textContent+=text[i];chatBox.scrollTop=chatBox.scrollHeight;await new Promise(r=>setTimeout(r,9+Math.random()*3));}if(text.length>THRESHOLD){el.textContent+=text.slice(THRESHOLD);chatBox.scrollTop=chatBox.scrollHeight;}}
 
-  const parts = text.split(/```/);
-  for (let i = 0; i < parts.length; i++) {
-    const chunk = parts[i].trim();
-    if (!chunk) continue;
-    if (i % 2 === 0) {
-      const div = document.createElement("div");
-      div.classList.add("msg-content");
-      msg.appendChild(div);
-      await typeMessage(div, chunk);
-    } else {
-      msg.appendChild(makeCodeBlock(chunk));
-    }
-  }
+const uploadBtn=document.getElementById("uploadBtn");
+const imagePreviewContainer=document.getElementById("imagePreviewContainer");
+const imagePreview=document.getElementById("imagePreview");
+const removeImageBtn=document.getElementById("removeImageBtn");
+let selectedImage=null;
 
-  inner.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+uploadBtn.addEventListener("click",()=>{const inputFile=document.createElement("input");inputFile.type="file";inputFile.accept="image/*";inputFile.click();inputFile.onchange=()=>{const file=inputFile.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{selectedImage=reader.result;imagePreview.src=selectedImage;imagePreviewContainer.style.display="block";};reader.readAsDataURL(file);};});
 
-function renderHistoryMessage(role, content, image = null) {
-  const inner = getOrCreateChatInner();
-  const msg = document.createElement("div");
-  msg.classList.add("msg", role);
+removeImageBtn.addEventListener("click",()=>{selectedImage=null;imagePreviewContainer.style.display="none";imagePreview.src="";});
 
-  if (image) {
-    const div = document.createElement("div");
-    div.classList.add("msg-content");
-    const img = document.createElement("img");
-    img.src = image;
-    img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border)";
-    div.appendChild(img);
-    msg.appendChild(div);
-  } else {
-    const parts = content.split(/```/);
-    for (let i = 0; i < parts.length; i++) {
-      const chunk = parts[i].trim();
-      if (!chunk) continue;
-      if (i % 2 === 0) {
-        const div = document.createElement("div");
-        div.classList.add("msg-content");
-        if (chunk.startsWith("<div")) div.innerHTML = chunk;
-        else div.textContent = chunk;
-        msg.appendChild(div);
-      } else {
-        msg.appendChild(makeCodeBlock(chunk));
-      }
-    }
-  }
-  inner.appendChild(msg);
-}
+function appendUserImage(imageBase64){const inner=getOrCreateChatInner();const msg=document.createElement("div");msg.classList.add("msg","user");const content=document.createElement("div");content.classList.add("msg-content");const img=document.createElement("img");img.src=imageBase64;img.style.cssText="max-width:100%;border-radius:10px;border:1px solid var(--border)";content.appendChild(img);msg.appendChild(content);inner.appendChild(msg);chatBox.scrollTop=chatBox.scrollHeight;}
 
-function makeCodeBlock(code) {
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("code-block-wrapper");
-  const copyBtn = document.createElement("button");
-  copyBtn.classList.add("copy-btn");
-  copyBtn.textContent = "Salin";
-  const codeDiv = document.createElement("div");
-  codeDiv.classList.add("code-block");
-  codeDiv.textContent = code;
-  copyBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(code);
-    copyBtn.textContent = "✓ Tersalin";
-    setTimeout(() => copyBtn.textContent = "Salin", 1500);
-  });
-  wrapper.appendChild(copyBtn);
-  wrapper.appendChild(codeDiv);
-  return wrapper;
-}
+async function renderBotMessageWithCode(container,text){const parts=text.split(/```/);for(let i=0;i<parts.length;i++){const chunk=parts[i].trim();if(!chunk)continue;if(i%2===0){const div=document.createElement("div");div.classList.add("msg-content");container.appendChild(div);await typeMessage(div,chunk);}else{container.appendChild(makeCodeBlock(chunk));}}}
 
-async function typeMessage(el, text) {
-  const THRESHOLD = 40;
-  el.textContent = "";
-  const animLen = Math.min(text.length, THRESHOLD);
-  for (let i = 0; i < animLen; i++) {
-    el.textContent += text[i];
-    chatBox.scrollTop = chatBox.scrollHeight;
-    await new Promise(r => setTimeout(r, 9 + Math.random() * 3));
-  }
-  if (text.length > THRESHOLD) {
-    el.textContent += text.slice(THRESHOLD);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-}
+const smartLoadingTexts=["Sedang memahami pertanyaan...","Mencari informasi yang relevan...","Menyusun jawaban terbaik...","Memproses data...","Menganalisis konteks...","Hampir selesai..."];
 
-const uploadBtn = document.getElementById("uploadBtn");
-const imagePreviewContainer = document.getElementById("imagePreviewContainer");
-const imagePreview = document.getElementById("imagePreview");
-const removeImageBtn = document.getElementById("removeImageBtn");
-let selectedImage = null;
+function createSmartLoader(){const wrap=document.createElement("div");wrap.className="smart-loading-wrap";const dots=document.createElement("div");dots.className="loading-dots";dots.innerHTML="<span></span><span></span><span></span>";const txt=document.createElement("div");txt.className="smart-loading-text";wrap.appendChild(dots);wrap.appendChild(txt);let idx=0;let cycleInterval=null;let smartTimeout=null;smartTimeout=setTimeout(()=>{idx=0;txt.textContent=smartLoadingTexts[0];requestAnimationFrame(()=>{requestAnimationFrame(()=>{txt.classList.add("visible");});});cycleInterval=setInterval(()=>{txt.classList.remove("visible");setTimeout(()=>{idx=(idx+1)%smartLoadingTexts.length;txt.textContent=smartLoadingTexts[idx];requestAnimationFrame(()=>{requestAnimationFrame(()=>{txt.classList.add("visible");});});},350);},1900);},700);function stop(){clearTimeout(smartTimeout);clearInterval(cycleInterval);}return{el:wrap,stop};}
 
-uploadBtn.addEventListener("click", () => {
-  const inputFile = document.createElement("input");
-  inputFile.type = "file";
-  inputFile.accept = "image/*";
-  inputFile.click();
-  inputFile.onchange = () => {
-    const file = inputFile.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedImage = reader.result;
-      imagePreview.src = selectedImage;
-      imagePreviewContainer.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  };
-});
+async function sendMsg(){const text=input.value.trim();if(!text&&!selectedImage)return;sendBtn.disabled=true;const imageToSend=selectedImage;input.value="";input.style.height="auto";const inner=getOrCreateChatInner();const empty=inner.querySelector(".empty-state");if(empty)empty.remove();let isNewChat=false;if(!currentChatId){currentChatId="chat-"+Date.now();initChatMemory(currentChatId);localStorage.setItem("activeChatId",currentChatId);isNewChat=true;}else{initChatMemory(currentChatId);}
+if(imageToSend){appendUserImage(imageToSend);chatMemory[currentChatId].push({role:"user",content:"[image]",image:imageToSend});selectedImage=null;imagePreviewContainer.style.display="none";imagePreview.src="";}
+if(text){await addMessage("user",text);chatMemory[currentChatId].push({role:"user",content:text});}
+if(isNewChat&&(text||imageToSend)){const title=await generateTitle(text||"Gambar");chatNames[currentChatId]=title;renderChatList();}
+saveMemory();const botMsg=document.createElement("div");botMsg.classList.add("msg","bot");const loader=createSmartLoader();botMsg.appendChild(loader.el);inner.appendChild(botMsg);chatBox.scrollTop=chatBox.scrollHeight;try{const mode=localStorage.getItem("aiMode")||"normal";let payload={sender:senderId,message:text,mode:mode};let apiEndpoint=`${backendUrl}/api/ai`;if(imageToSend){payload.image=imageToSend;payload.mode=mode;apiEndpoint=`${backendUrl}/api/ai-image`;}const res=await fetch(apiEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(!res.ok)throw new Error("HTTP error");const data=await res.json();loader.stop();if(Array.isArray(data.replies)){loader.el.style.transition="opacity 0.3s ease";loader.el.style.opacity="0";await new Promise(r=>setTimeout(r,300));botMsg.remove();for(const r of data.replies){if(!r.content||!r.content.trim())continue;const msg=document.createElement("div");msg.classList.add("msg","bot");const content=document.createElement("div");content.classList.add("msg-content","msg-content-reveal");msg.appendChild(content);inner.appendChild(msg);if(r.type==="buttons")content.innerHTML=r.content;else await typeMessage(content,r.content);chatBox.scrollTop=chatBox.scrollHeight;chatMemory[currentChatId].push({role:"bot",content:r.content});}saveMemory();if(data.remaining!==undefined)updateLimitUI(data.remaining);return;}const reply=data.reply||"";if(!reply.trim()){loader.el.style.transition="opacity 0.25s ease";loader.el.style.opacity="0";await new Promise(r=>setTimeout(r,250));botMsg.remove();return;}loader.el.style.transition="opacity 0.3s ease";loader.el.style.opacity="0";await new Promise(r=>setTimeout(r,300));loader.el.remove();await new Promise(r=>setTimeout(r,80));if(reply.trim().startsWith("<")){const div=document.createElement("div");div.classList.add("msg-content","msg-content-reveal");div.innerHTML=reply;botMsg.appendChild(div);}else if(reply.includes("```")){await renderBotMessageWithCode(botMsg,reply);}else{const div=document.createElement("div");div.classList.add("msg-content","msg-content-reveal");botMsg.appendChild(div);await typeMessage(div,reply);}chatMemory[currentChatId].push({role:"bot",content:reply});saveMemory();if(data.remaining!==undefined)updateLimitUI(data.remaining);}catch(e){console.error(e);loader.stop();loader.el.style.transition="opacity 0.25s ease";loader.el.style.opacity="0";await new Promise(r=>setTimeout(r,250));botMsg.remove();await addMessage("bot","❌ Gagal terhubung ke server.");}finally{sendBtn.disabled=false;}}
 
-removeImageBtn.addEventListener("click", () => {
-  selectedImage = null;
-  imagePreviewContainer.style.display = "none";
-  imagePreview.src = "";
-});
+function loadChat(chatId){currentChatId=chatId;localStorage.setItem("activeChatId",chatId);chatBox.innerHTML="";const inner=document.createElement("div");inner.className="chat-inner";chatBox.appendChild(inner);initChatMemory(chatId);if(chatMemory[chatId].length){chatMemory[chatId].forEach(m=>{if(m.image)renderHistoryMessage("user","",m.image);else renderHistoryMessage(m.role==="user"?"user":"bot",m.content);});}else{inner.innerHTML=`<div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div>`;}chatBox.scrollTop=chatBox.scrollHeight;fetchLimit();closeMobileSidebar();}
 
-function appendUserImage(imageBase64) {
-  const inner = getOrCreateChatInner();
-  const msg = document.createElement("div");
-  msg.classList.add("msg", "user");
-  const content = document.createElement("div");
-  content.classList.add("msg-content");
-  const img = document.createElement("img");
-  img.src = imageBase64;
-  img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border)";
-  content.appendChild(img);
-  msg.appendChild(content);
-  inner.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+function renderChatList(){chatLists.forEach(list=>{list.innerHTML="";const ids=Object.keys(chatMemory).reverse();if(ids.length===0){list.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:8px 4px;">Belum ada obrolan</div>`;return;}ids.forEach(chatId=>{const item=document.createElement("div");item.classList.add("chat-item");const nameSpan=document.createElement("span");nameSpan.textContent=chatNames[chatId]||"Obrolan Baru";const delBtn=document.createElement("button");delBtn.classList.add("del-btn");delBtn.innerHTML="🗑";nameSpan.addEventListener("click",()=>loadChat(chatId));delBtn.addEventListener("click",e=>{e.stopPropagation();showPopup(chatId);});item.appendChild(nameSpan);item.appendChild(delBtn);list.appendChild(item);});});}
 
-async function renderBotMessageWithCode(container, text) {
-  const parts = text.split(/```/);
-  for (let i = 0; i < parts.length; i++) {
-    const chunk = parts[i].trim();
-    if (!chunk) continue;
-    if (i % 2 === 0) {
-      const div = document.createElement("div");
-      div.classList.add("msg-content");
-      container.appendChild(div);
-      await typeMessage(div, chunk);
-    } else {
-      container.appendChild(makeCodeBlock(chunk));
-    }
-  }
-}
+let deleteTargetChat=null;
+function showPopup(chatId){deleteTargetChat=chatId;document.getElementById("deletePopup").style.display="flex";}
+function closePopup(){deleteTargetChat=null;document.getElementById("deletePopup").style.display="none";}
 
-const smartLoadingTexts = [
-  "Sedang memahami pertanyaan...",
-  "Mencari informasi yang relevan...",
-  "Menyusun jawaban terbaik...",
-  "Memproses data...",
-  "Menganalisis konteks...",
-  "Hampir selesai...",
-];
+document.getElementById("confirmDeleteBtn").onclick=()=>{if(!deleteTargetChat)return;delete chatMemory[deleteTargetChat];delete chatNames[deleteTargetChat];if(currentChatId===deleteTargetChat){currentChatId=null;localStorage.removeItem("activeChatId");}saveMemory();renderChatList();chatBox.innerHTML=`<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;closePopup();};
 
-function createSmartLoader() {
-  const wrap = document.createElement("div");
-  wrap.className = "smart-loading-wrap";
+document.getElementById("mobileMenuBtn").addEventListener("click",()=>{document.querySelector(".sidebar.overlay").classList.add("show");document.querySelector(".sidebar-backdrop").style.display="block";});
+document.querySelector(".sidebar-backdrop").addEventListener("click",closeMobileSidebar);
 
-  const dots = document.createElement("div");
-  dots.className = "loading-dots";
-  dots.innerHTML = "<span></span><span></span><span></span>";
+document.querySelectorAll(".new-chat-btn").forEach(btn=>{btn.addEventListener("click",async()=>{try{await fetch(`${backendUrl}/api/ai`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sender:senderId,message:"",reset:true,mode:localStorage.getItem("aiMode")||"normal"})});}catch{}currentChatId=null;localStorage.removeItem("activeChatId");chatBox.innerHTML=`<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;closeMobileSidebar();});});
 
-  const txt = document.createElement("div");
-  txt.className = "smart-loading-text";
+document.getElementById("loginBtnDesktop").onclick=()=>window.location.href="settings.html";
+document.getElementById("loginBtnMobile").onclick=()=>window.location.href="settings.html";
 
-  wrap.appendChild(dots);
-  wrap.appendChild(txt);
+async function generateTitle(topic){try{const res=await fetch(`${backendUrl}/api/generate-title`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:topic})});const data=await res.json();return data.title||"Obrolan Baru";}catch{return"Obrolan Baru";}}
 
-  let idx = 0;
-  let cycleInterval = null;
-  let smartTimeout = null;
+async function fetchLimit(){try{const res=await fetch(`${backendUrl}/api/ai`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sender:senderId,message:""})});const data=await res.json();if(data.remaining!==undefined)updateLimitUI(data.remaining);}catch{}}
 
-  smartTimeout = setTimeout(() => {
-    idx = 0;
-    txt.textContent = smartLoadingTexts[0];
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => { txt.classList.add("visible"); });
-    });
-
-    cycleInterval = setInterval(() => {
-      txt.classList.remove("visible");
-      setTimeout(() => {
-        idx = (idx + 1) % smartLoadingTexts.length;
-        txt.textContent = smartLoadingTexts[idx];
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => { txt.classList.add("visible"); });
-        });
-      }, 350);
-    }, 1900);
-  }, 700);
-
-  function stop() {
-    clearTimeout(smartTimeout);
-    clearInterval(cycleInterval);
-  }
-
-  return { el: wrap, stop };
-}
-
-// ── GENERATE GAMBAR ──
-async function generateImage(prompt) {
-  const mode = localStorage.getItem("aiMode") || "normal";
-  
-  const inner = getOrCreateChatInner();
-  const empty = inner.querySelector(".empty-state");
-  if (empty) empty.remove();
-  
-  const loadingBox = createImageLoadingBox();
-  const msgWrapper = document.createElement("div");
-  msgWrapper.classList.add("msg", "bot");
-  msgWrapper.appendChild(loadingBox);
-  inner.appendChild(msgWrapper);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  
-  try {
-    const res = await fetch(`${backendUrl}/api/generate-image`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        sender: senderId, 
-        prompt: prompt,
-        mode: mode 
-      })
-    });
-    
-    const data = await res.json();
-    msgWrapper.remove();
-    
-    if (data.error) {
-      await addMessage("bot", "❌ " + data.error);
-      return;
-    }
-    
-    if (data.image) {
-      const msg = document.createElement("div");
-      msg.classList.add("msg", "bot");
-      
-      const img = document.createElement("img");
-      
-      // 🔥 CEK APAKAH URL ATAU BASE64
-      if (data.image.startsWith("http://") || data.image.startsWith("https://")) {
-        img.src = data.image;
-        img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
-        img.alt = "Gambar dari Pollinations.ai";
-        img.loading = "lazy";
-        
-        // Tambah link buat buka di tab baru
-        const link = document.createElement("a");
-        link.href = data.image;
-        link.target = "_blank";
-        link.style.cssText = "font-size:12px;color:var(--accent);text-decoration:none;display:inline-block;margin-top:4px;";
-        link.textContent = "🔗 Buka gambar di tab baru";
-        
-        msg.appendChild(img);
-        msg.appendChild(link);
-      } else {
-        img.src = data.image;
-        img.style.cssText = "max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;";
-        msg.appendChild(img);
-      }
-      
-      if (data.text) {
-        const textDiv = document.createElement("div");
-        textDiv.classList.add("msg-content");
-        textDiv.textContent = data.text;
-        msg.appendChild(textDiv);
-      }
-      
-      inner.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      
-      chatMemory[currentChatId].push({ 
-        role: "assistant", 
-        content: data.text || "Gambar berhasil dibuat!",
-        image: data.image 
-      });
-      saveMemory();
-      
-      if (data.remaining !== undefined) updateLimitUI(data.remaining);
-    }
-  } catch (err) {
-    console.error(err);
-    msgWrapper.remove();
-    await addMessage("bot", "❌ Gagal membuat gambar: " + err.message);
-  }
-}
-
-// ── SEND MESSAGE ──
-async function sendMsg() {
-  const text = input.value.trim();
-  if (!text && !selectedImage) return;
-
-  sendBtn.disabled = true;
-  const imageToSend = selectedImage;
-  input.value = "";
-  input.style.height = "auto";
-
-  const inner = getOrCreateChatInner();
-  const empty = inner.querySelector(".empty-state");
-  if (empty) empty.remove();
-
-  let isNewChat = false;
-  if (!currentChatId) {
-    currentChatId = "chat-" + Date.now();
-    initChatMemory(currentChatId);
-    localStorage.setItem("activeChatId", currentChatId);
-    isNewChat = true;
-  } else {
-    initChatMemory(currentChatId);
-  }
-
-  const imageKeywords = [
-    "/image", "/img", "/gambar", "/generate", "/gen", "/create", "/draw",
-    "buat gambar", "buatkan gambar", "bikin gambar", "bikinin gambar", 
-    "buatin gambar", "tolong buatkan gambar", "tolong bikin gambar", "minta gambar",
-    "gambarkan", "gambarin", "lukis", "lukisin", "lukiskan",
-    "hasil gambar", "ciptakan gambar", "kreasi gambar",
-    "generate gambar", "generated gambar", "generating gambar",
-    "gambar kucing", "gambar anime", "gambar pemandangan", "gambar kartun",
-    "gambar abstrak", "gambar realistik", "gambar 3d", "gambar ilustrasi",
-    "gambar robot", "gambar bunga", "gambar mobil", "gambar rumah",
-    "gambar gedung", "gambar laut", "gambar gunung", "gambar pantai",
-    "gambar hutan", "gambar hewan", "gambar manusia", "gambar makanan",
-    "gambar minuman", "gambar alam", "gambar fantasi", "gambar manga",
-    "gambar sketsa", "gambar doodle", "gambar minimalis", "gambar vintage",
-    "buatin dong gambar", "bikinin dong gambar", "gambar dong",
-    "minta gambar", "mau gambar", "ingin gambar", "butuh gambar",
-    "create image", "generate image", "make image", "draw image",
-    "create picture", "generate picture", "make picture", "draw picture",
-    "image of", "picture of", "photo of", "illustration of",
-    "make a image", "make an image", "create an image", "generate an image",
-    "buatkan image", "bikinin image", "gambar image"
-  ];
-
-  const isImageRequest = imageKeywords.some(keyword => 
-    text.toLowerCase().includes(keyword)
-  );
-  
-  if (isImageRequest && text && !imageToSend) {
-    await addMessage("user", text);
-    chatMemory[currentChatId].push({ role: "user", content: text });
-    
-    if (isNewChat) {
-      const title = await generateTitle(text);
-      chatNames[currentChatId] = title;
-      renderChatList();
-    }
-    saveMemory();
-    
-    await generateImage(text);
-    sendBtn.disabled = false;
-    return;
-  }
-
-  if (imageToSend) {
-    appendUserImage(imageToSend);
-    chatMemory[currentChatId].push({ role: "user", content: "[image]", image: imageToSend });
-    selectedImage = null;
-    imagePreviewContainer.style.display = "none";
-    imagePreview.src = "";
-  }
-
-  if (text) {
-    await addMessage("user", text);
-    chatMemory[currentChatId].push({ role: "user", content: text });
-  }
-
-  if (isNewChat && (text || imageToSend)) {
-    const title = await generateTitle(text || "Gambar");
-    chatNames[currentChatId] = title;
-    renderChatList();
-  }
-
-  saveMemory();
-
-  const botMsg = document.createElement("div");
-  botMsg.classList.add("msg", "bot");
-
-  const loader = createSmartLoader();
-  botMsg.appendChild(loader.el);
-  inner.appendChild(botMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  try {
-    const mode = localStorage.getItem("aiMode") || "normal";
-    
-    let payload = { 
-      sender: senderId, 
-      message: text,
-      mode: mode
-    };
-    let apiEndpoint = `${backendUrl}/api/ai`;
-    if (imageToSend) { 
-      payload.image = imageToSend; 
-      payload.mode = mode;
-      apiEndpoint = `${backendUrl}/api/ai-image`; 
-    }
-
-    const res = await fetch(apiEndpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error("HTTP error");
-    const data = await res.json();
-
-    loader.stop();
-
-    if (Array.isArray(data.replies)) {
-      loader.el.style.transition = "opacity 0.3s ease";
-      loader.el.style.opacity = "0";
-      await new Promise(r => setTimeout(r, 300));
-      botMsg.remove();
-
-      for (const r of data.replies) {
-        if (!r.content || !r.content.trim()) continue;
-        const msg = document.createElement("div");
-        msg.classList.add("msg", "bot");
-        const content = document.createElement("div");
-        content.classList.add("msg-content", "msg-content-reveal");
-        msg.appendChild(content);
-        inner.appendChild(msg);
-        if (r.type === "buttons") content.innerHTML = r.content;
-        else await typeMessage(content, r.content);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        chatMemory[currentChatId].push({ role: "bot", content: r.content });
-      }
-      saveMemory();
-      if (data.remaining !== undefined) updateLimitUI(data.remaining);
-      return;
-    }
-
-    const reply = data.reply || "";
-    if (!reply.trim()) {
-      loader.el.style.transition = "opacity 0.25s ease";
-      loader.el.style.opacity = "0";
-      await new Promise(r => setTimeout(r, 250));
-      botMsg.remove();
-      return;
-    }
-
-    loader.el.style.transition = "opacity 0.3s ease";
-    loader.el.style.opacity = "0";
-    await new Promise(r => setTimeout(r, 300));
-    loader.el.remove();
-
-    await new Promise(r => setTimeout(r, 80));
-
-    if (reply.trim().startsWith("<")) {
-      const div = document.createElement("div");
-      div.classList.add("msg-content", "msg-content-reveal");
-      div.innerHTML = reply;
-      botMsg.appendChild(div);
-    } else if (reply.includes("```")) {
-      await renderBotMessageWithCode(botMsg, reply);
-    } else {
-      const div = document.createElement("div");
-      div.classList.add("msg-content", "msg-content-reveal");
-      botMsg.appendChild(div);
-      await typeMessage(div, reply);
-    }
-
-    chatMemory[currentChatId].push({ role: "bot", content: reply });
-    saveMemory();
-    if (data.remaining !== undefined) updateLimitUI(data.remaining);
-  } catch (e) {
-    console.error(e);
-    loader.stop();
-    loader.el.style.transition = "opacity 0.25s ease";
-    loader.el.style.opacity = "0";
-    await new Promise(r => setTimeout(r, 250));
-    botMsg.remove();
-    await addMessage("bot", "❌ Gagal terhubung ke server.");
-  } finally {
-    sendBtn.disabled = false;
-  }
-}
-
-function loadChat(chatId) {
-  currentChatId = chatId;
-  localStorage.setItem("activeChatId", chatId);
-  chatBox.innerHTML = "";
-  const inner = document.createElement("div");
-  inner.className = "chat-inner";
-  chatBox.appendChild(inner);
-  initChatMemory(chatId);
-
-  if (chatMemory[chatId].length) {
-    chatMemory[chatId].forEach(m => {
-      if (m.image) renderHistoryMessage("user", "", m.image);
-      else renderHistoryMessage(m.role === "user" ? "user" : "bot", m.content);
-    });
-  } else {
-    inner.innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div>`;
-  }
-
-  chatBox.scrollTop = chatBox.scrollHeight;
-  fetchLimit();
-  closeMobileSidebar();
-}
-
-function renderChatList() {
-  chatLists.forEach(list => {
-    list.innerHTML = "";
-    const ids = Object.keys(chatMemory).reverse();
-    if (ids.length === 0) {
-      list.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:8px 4px;">Belum ada obrolan</div>`;
-      return;
-    }
-    ids.forEach(chatId => {
-      const item = document.createElement("div");
-      item.classList.add("chat-item");
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = chatNames[chatId] || "Obrolan Baru";
-      const delBtn = document.createElement("button");
-      delBtn.classList.add("del-btn");
-      delBtn.innerHTML = "🗑";
-      nameSpan.addEventListener("click", () => loadChat(chatId));
-      delBtn.addEventListener("click", e => { e.stopPropagation(); showPopup(chatId); });
-      item.appendChild(nameSpan);
-      item.appendChild(delBtn);
-      list.appendChild(item);
-    });
-  });
-}
-
-let deleteTargetChat = null;
-function showPopup(chatId) { deleteTargetChat = chatId; document.getElementById("deletePopup").style.display = "flex"; }
-function closePopup() { deleteTargetChat = null; document.getElementById("deletePopup").style.display = "none"; }
-
-document.getElementById("confirmDeleteBtn").onclick = () => {
-  if (!deleteTargetChat) return;
-  delete chatMemory[deleteTargetChat];
-  delete chatNames[deleteTargetChat];
-  if (currentChatId === deleteTargetChat) {
-    currentChatId = null;
-    localStorage.removeItem("activeChatId");
-  }
-  saveMemory();
-  renderChatList();
-  chatBox.innerHTML = `<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;
-  closePopup();
-};
-
-document.getElementById("mobileMenuBtn").addEventListener("click", () => {
-  document.querySelector(".sidebar.overlay").classList.add("show");
-  document.querySelector(".sidebar-backdrop").style.display = "block";
-});
-document.querySelector(".sidebar-backdrop").addEventListener("click", closeMobileSidebar);
-
-document.querySelectorAll(".new-chat-btn").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    try {
-      await fetch(`${backendUrl}/api/ai`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender: senderId, message: "", reset: true, mode: localStorage.getItem("aiMode") || "normal" })
-      });
-    } catch {}
-    currentChatId = null;
-    localStorage.removeItem("activeChatId");
-    chatBox.innerHTML = `<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;
-    closeMobileSidebar();
-  });
-});
-
-document.getElementById("loginBtnDesktop").onclick = () => window.location.href = "settings.html";
-document.getElementById("loginBtnMobile").onclick = () => window.location.href = "settings.html";
-
-async function generateTitle(topic) {
-  try {
-    const res = await fetch(`${backendUrl}/api/generate-title`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: topic })
-    });
-    const data = await res.json();
-    return data.title || "Obrolan Baru";
-  } catch { return "Obrolan Baru"; }
-}
-
-async function fetchLimit() {
-  try {
-    const res = await fetch(`${backendUrl}/api/ai`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: senderId, message: "" })
-    });
-    const data = await res.json();
-    if (data.remaining !== undefined) updateLimitUI(data.remaining);
-  } catch {}
-}
-
-function saveMemory() {
-  localStorage.setItem("chatMemory", JSON.stringify(chatMemory));
-  localStorage.setItem("chatNames", JSON.stringify(chatNames));
-  localStorage.setItem("senderId", senderId);
-}
+function saveMemory(){localStorage.setItem("chatMemory",JSON.stringify(chatMemory));localStorage.setItem("chatNames",JSON.stringify(chatNames));localStorage.setItem("senderId",senderId);}
 
 renderChatList();
-const activeChatId = localStorage.getItem("activeChatId");
-if (activeChatId && chatMemory[activeChatId]) {
-  loadChat(activeChatId);
-} else if (Object.keys(chatMemory).length > 0) {
-  loadChat(Object.keys(chatMemory).slice(-1)[0]);
-} else {
-  currentChatId = null;
-}
+const activeChatId=localStorage.getItem("activeChatId");
+if(activeChatId&&chatMemory[activeChatId]){loadChat(activeChatId);}else if(Object.keys(chatMemory).length>0){loadChat(Object.keys(chatMemory).slice(-1)[0]);}else{currentChatId=null;}
 
-sendBtn.addEventListener("click", sendMsg);
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMsg();
-  }
-});
-
+sendBtn.addEventListener("click",sendMsg);
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg();}});
 fetchLimit();
 
-async function checkModeReset() {
-  if (localStorage.getItem("aiShouldReset") !== "yes") return;
-  try {
-    await fetch(`${backendUrl}/api/ai`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: senderId, message: "", reset: true, mode: localStorage.getItem("aiMode") || "normal" })
-    });
-  } catch {}
-  currentChatId = null;
-  localStorage.removeItem("activeChatId");
-  chatBox.innerHTML = `<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;
-  renderChatList();
-  localStorage.removeItem("aiShouldReset");
-}
+async function checkModeReset(){if(localStorage.getItem("aiShouldReset")!=="yes")return;try{await fetch(`${backendUrl}/api/ai`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sender:senderId,message:"",reset:true,mode:localStorage.getItem("aiMode")||"normal"})});}catch{}currentChatId=null;localStorage.removeItem("activeChatId");chatBox.innerHTML=`<div class="chat-inner"><div class="empty-state"><div class="empty-icon">✦</div><h3>QuantumX siap membantu</h3><p>Ketik pesan untuk memulai percakapan</p></div></div>`;renderChatList();localStorage.removeItem("aiShouldReset");}
 
-window.addEventListener("DOMContentLoaded", checkModeReset);
-window.addEventListener("focus", checkModeReset);
+window.addEventListener("DOMContentLoaded",checkModeReset);
+window.addEventListener("focus",checkModeReset);
 </script>
 </body>
 </html>
